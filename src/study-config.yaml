@@ -1,0 +1,93 @@
+study:
+  id: study1
+  title: Study 1
+
+comprehensionChecks:
+  - id: cringe
+    definition: |
+      "Cringe" is a feeling of embarrassment or awkwardness you experience
+      when you see someone do something that feels socially uncomfortable,
+      out of touch, or trying too hard. For example, you might "cringe"
+      when a parent tries to use teenage slang, or when someone makes an
+      awkward joke that doesn't land.
+    question: "Based on the definition above, which of the following best describes 'cringe'?"
+    options:
+      - text: "A feeling of physical pain"
+        correct: false
+      - text: "A feeling of embarrassment from something socially awkward or out of touch"
+        correct: true
+      - text: "A feeling of excitement and surprise"
+        correct: false
+      - text: "A feeling of sadness and grief"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the definition and try again."
+
+  - id: meme
+    definition: |
+      A "meme" is a humorous image, video, or piece of text that is widely
+      shared on the internet. Memes typically use a familiar image or format
+      combined with new text to make a joke or express an idea that many
+      people can relate to. They spread quickly on social media and often
+      reference pop culture or everyday situations.
+    question: "Based on the definition above, which of the following best describes a meme?"
+    options:
+      - text: "A professional photograph used in news articles"
+        correct: false
+      - text: "A widely shared humorous image or text format, often referencing pop culture"
+        correct: true
+      - text: "A type of formal business communication"
+        correct: false
+      - text: "A scientific diagram used for education"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the definition and try again."
+
+memeExamples:
+  introduction: |
+    Companies sometimes use memes in their advertising to connect with
+    audiences on social media. Below are three real examples of brands
+    using memes in their ads.
+  images:
+    - src: /stimuli/Bumble.jpeg
+      alt: "Bumble dating app meme ad using Barbie movie format"
+    - src: /stimuli/Drake.png
+      alt: "Resparked gift shop ad using Drake meme format"
+    - src: /stimuli/Ruffles.png
+      alt: "Ruffles snack brand meme ad using classic painting format"
+
+categories:
+  - Video games
+  - Snack foods
+  - Amusement parks
+  - Travel
+  - Fitness classes
+  - Cars/Trucks
+  - Insurance providers
+  - Home renovation
+  - Wedding planning
+  - Financial services
+  - Public transportation
+  - Tax preparation
+  - Healthcare
+  - Funeral services
+
+dependentVariables:
+  - id: appropriateness
+    questionTemplate: "How appropriate is it for a {category} company to use meme ads?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all appropriate"
+    maxLabel: "Extremely appropriate"
+  - id: cringe
+    questionTemplate: "How \"cringe\" is it for a {category} company to use meme ads?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all \"cringe\""
+    maxLabel: "Extremely \"cringe\""
+
+design:
+  type: within-subjects
+  categoryOrder: randomized
+  dvBlocking: randomized
+  transitionText: "Now you will answer a different question about the same types of companies."
+
+qualtricsReturnUrl: "https://YOURUNIVERSITY.qualtrics.com/jfe/form/SV_REPLACE_ME"

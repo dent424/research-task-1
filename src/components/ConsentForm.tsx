@@ -53,13 +53,13 @@ export default function ConsentForm({ onAgree, onDecline }: ConsentFormProps) {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
         <button
           onClick={onAgree}
-          className="rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-zinc-700 dark:hover:bg-zinc-300"
+          className="rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-zinc-700"
         >
           I agree
         </button>
         <button
           onClick={onDecline}
-          className="rounded-full border border-zinc-300 px-6 py-3 transition-colors hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          className="rounded-full border border-zinc-300 px-6 py-3 transition-colors hover:bg-zinc-100"
         >
           I do NOT agree
         </button>

@@ -24,3 +24,34 @@ export function redirectToQualtrics(
 ): void {
   window.location.href = buildQualtricsRedirectUrl(qualtricsUrl, data);
 }
+
+/**
+ * Unicode-safe Base64 encoding. Handles any characters, not just Latin-1.
+ */
+function toBase64(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Encode a study data object as a Base64 JSON string and redirect to Qualtrics.
+ * The data is passed as a single `data` query parameter, with `pid` also passed
+ * as a standalone param for easy Qualtrics linking.
+ */
+export function redirectWithEncodedData(
+  qualtricsUrl: string,
+  studyData: Record<string, unknown>
+): void {
+  const jsonString = JSON.stringify(studyData);
+  const encoded = toBase64(jsonString);
+  const pid = (studyData.pid as string) ?? "";
+
+  redirectToQualtrics(qualtricsUrl, {
+    pid,
+    data: encoded,
+  });
+}
