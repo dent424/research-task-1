@@ -56,30 +56,30 @@ memeExamples:
       alt: "Ruffles snack brand meme ad using classic painting format"
 
 categories:
-  - Video games
-  - Snack foods
-  - Amusement parks
-  - Travel
-  - Fitness classes
-  - Cars/Trucks
-  - Insurance providers
-  - Home renovation
-  - Wedding planning
-  - Financial services
+  - A video game company
+  - A snack foods company
+  - An amusement park
+  - An airline
+  - A gym
+  - A car company
+  - An insurance company
+  - A home renovation company
+  - A wedding planning company
+  - A financial services company
   - Public transportation
-  - Tax preparation
-  - Healthcare
-  - Funeral services
+  - A tax preparation company
+  - A healthcare company
+  - A funeral services company
 
 dependentVariables:
   - id: appropriateness
-    questionTemplate: "How appropriate is it for a {category} company to use meme ads?"
+    questionTemplate: "How appropriate is it for {category} to use meme ads?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all appropriate"
     maxLabel: "Extremely appropriate"
   - id: cringe
-    questionTemplate: "How \"cringe\" is it for a {category} company to use meme ads?"
+    questionTemplate: "How \"cringe\" is it for {category} to use meme ads?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all \"cringe\""
@@ -91,4 +91,4 @@ design:
   dvBlocking: randomized
   transitionText: "Now you will answer a different question about the same types of companies."
 
-qualtricsReturnUrl: "https://YOURUNIVERSITY.qualtrics.com/jfe/form/SV_REPLACE_ME"
+qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_5mMH3rsqbMVeJoO"
