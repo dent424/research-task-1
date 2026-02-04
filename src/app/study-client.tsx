@@ -272,6 +272,7 @@ export default function StudyClient({ config }: StudyClientProps) {
           <MemeExamples
             introduction={config.memeExamples.introduction}
             images={config.memeExamples.images}
+            minViewingSeconds={config.memeExamples.minViewingSeconds}
             onContinue={handleMemeExamplesContinue}
           />
         )}

@@ -28,7 +28,8 @@ export default function CategoryRating({
 }: CategoryRatingProps) {
   const [value, setValue] = useState<number | null>(null);
 
-  const formattedQuestion = question.replace("{category}", category);
+  const displayCategory = category.charAt(0).toLowerCase() + category.slice(1);
+  const parts = question.split("{category}");
 
   return (
     <div className="flex flex-col items-center gap-8 max-w-2xl">
@@ -36,7 +37,11 @@ export default function CategoryRating({
         {currentIndex + 1} of {totalCount}
       </p>
 
-      <h3 className="text-lg font-medium text-center">{formattedQuestion}</h3>
+      <h3 className="text-lg font-medium text-center">
+        {parts[0]}
+        <span className="font-bold underline">{displayCategory}</span>
+        {parts[1]}
+      </h3>
 
       <LikertScale
         min={scaleMin}

@@ -42,6 +42,7 @@ comprehensionChecks:
     retryMessage: "That's not quite right. Please re-read the definition and try again."
 
 memeExamples:
+  minViewingSeconds: 10
   introduction: |
     Companies sometimes use memes in their advertising to connect with
     audiences on social media. Below are three real examples of brands

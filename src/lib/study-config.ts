@@ -23,6 +23,7 @@ export interface MemeExampleImage {
 export interface MemeExamples {
   introduction: string;
   images: MemeExampleImage[];
+  minViewingSeconds: number;
 }
 
 export interface DependentVariable {
