@@ -44,14 +44,19 @@ function toBase64(str: string): string {
  */
 export function redirectWithEncodedData(
   qualtricsUrl: string,
-  studyData: Record<string, unknown>
+  studyData: Record<string, unknown>,
+  extraParams?: Record<string, string>
 ): void {
   const jsonString = JSON.stringify(studyData);
   const encoded = toBase64(jsonString);
   const pid = (studyData.pid as string) ?? "";
 
-  redirectToQualtrics(qualtricsUrl, {
-    pid,
-    data: encoded,
-  });
+  const params: Record<string, string | number> = { pid, data: encoded };
+  if (extraParams) {
+    for (const [key, value] of Object.entries(extraParams)) {
+      params[key] = value;
+    }
+  }
+
+  redirectToQualtrics(qualtricsUrl, params);
 }

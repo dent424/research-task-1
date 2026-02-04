@@ -91,4 +91,24 @@ design:
   dvBlocking: randomized
   transitionText: "Now you will answer a different question about the same types of companies."
 
+freeResponse:
+  question: "Did using meme ads feel more cringey in some product categories than others? If so, why? If not, why not?"
+  aiWarning: "Please write your response in your own words. Do not use AI services such as ChatGPT, Claude, or similar tools to generate your answer."
+  minChars: 15
+  maxChars: 500
+  minSeconds: 60
+  placeholder: "Type your response here..."
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
 qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_5mMH3rsqbMVeJoO"

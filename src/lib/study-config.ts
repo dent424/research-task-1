@@ -35,6 +35,20 @@ export interface DependentVariable {
   maxLabel: string;
 }
 
+export interface FreeResponseConfig {
+  question: string;
+  aiWarning: string;
+  minChars: number;
+  maxChars: number;
+  minSeconds: number;
+  placeholder: string;
+}
+
+export interface DemographicsConfig {
+  age: { label: string; placeholder: string };
+  gender: { label: string; options: string[] };
+}
+
 export interface StudyConfig {
   study: {
     id: string;
@@ -50,6 +64,8 @@ export interface StudyConfig {
     dvBlocking: string;
     transitionText: string;
   };
+  freeResponse?: FreeResponseConfig;
+  demographics?: DemographicsConfig;
   qualtricsReturnUrl: string;
 }
 

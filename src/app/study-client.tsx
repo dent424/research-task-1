@@ -10,6 +10,8 @@ import ComprehensionCheck from "@/components/ComprehensionCheck";
 import MemeExamples from "@/components/MemeExamples";
 import CategoryRating from "@/components/CategoryRating";
 import TransitionScreen from "@/components/TransitionScreen";
+import FreeResponse from "@/components/FreeResponse";
+import Demographics from "@/components/Demographics";
 import type { StudyConfig } from "@/lib/study-config";
 
 type Phase =
@@ -22,6 +24,8 @@ type Phase =
   | "block1"
   | "transition"
   | "block2"
+  | "free-response"
+  | "demographics"
   | "redirect";
 
 function categoryToKey(category: string): string {
@@ -48,6 +52,14 @@ export default function StudyClient({ config }: StudyClientProps) {
   const [ratings, setRatings] = useState<
     Record<string, Record<string, number>>
   >({});
+
+  // Free-response and demographics data
+  const [freeResponse, setFreeResponse] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const freeResponseRef = useRef("");
+  const ageRef = useRef("");
+  const genderRef = useRef("");
 
   // Timing data
   const startTimeRef = useRef<number>(0);
@@ -186,7 +198,14 @@ export default function StudyClient({ config }: StudyClientProps) {
     } else if (blockPhase === "block1") {
       setPhase("transition");
     } else {
-      setPhase("redirect");
+      // block2 done — advance to free-response, demographics, or redirect
+      if (config.freeResponse) {
+        setPhase("free-response");
+      } else if (config.demographics) {
+        setPhase("demographics");
+      } else {
+        setPhase("redirect");
+      }
     }
   }
 
@@ -194,6 +213,24 @@ export default function StudyClient({ config }: StudyClientProps) {
     setCurrentCategoryIndex(0);
     block2StartRef.current = Date.now();
     setPhase("block2");
+  }
+
+  function handleFreeResponseSubmit(text: string) {
+    setFreeResponse(text);
+    freeResponseRef.current = text;
+    if (config.demographics) {
+      setPhase("demographics");
+    } else {
+      setPhase("redirect");
+    }
+  }
+
+  function handleDemographicsSubmit(data: { age: string; gender: string }) {
+    setAge(data.age);
+    setGender(data.gender);
+    ageRef.current = data.age;
+    genderRef.current = data.gender;
+    setPhase("redirect");
   }
 
   // Handle redirect phase — only depends on `phase`
@@ -206,7 +243,12 @@ export default function StudyClient({ config }: StudyClientProps) {
       // localStorage unavailable — proceed anyway
     }
 
-    redirectWithEncodedData(config.qualtricsReturnUrl, studyDataRef.current);
+    const extra: Record<string, string> = {};
+    if (freeResponseRef.current) extra.free_response = freeResponseRef.current;
+    if (ageRef.current) extra.age = ageRef.current;
+    if (genderRef.current) extra.gender = genderRef.current;
+
+    redirectWithEncodedData(config.qualtricsReturnUrl, studyDataRef.current, extra);
   }, [phase, completedKey, config.qualtricsReturnUrl]);
 
   // Find comprehension check configs
@@ -315,6 +357,26 @@ export default function StudyClient({ config }: StudyClientProps) {
             onSubmit={(rating) =>
               handleRating("block2", block2Category, rating)
             }
+          />
+        )}
+
+        {phase === "free-response" && config.freeResponse && (
+          <FreeResponse
+            question={config.freeResponse.question}
+            aiWarning={config.freeResponse.aiWarning}
+            minChars={config.freeResponse.minChars}
+            maxChars={config.freeResponse.maxChars}
+            minSeconds={config.freeResponse.minSeconds}
+            placeholder={config.freeResponse.placeholder}
+            onSubmit={handleFreeResponseSubmit}
+          />
+        )}
+
+        {phase === "demographics" && config.demographics && (
+          <Demographics
+            ageConfig={config.demographics.age}
+            genderConfig={config.demographics.gender}
+            onSubmit={handleDemographicsSubmit}
           />
         )}
 
