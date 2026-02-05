@@ -73,13 +73,13 @@ categories:
 
 dependentVariables:
   - id: appropriateness
-    questionTemplate: "How appropriate is it for {category} to use meme ads?"
+    questionTemplate: "How appropriate would it be for {category} to use meme ads?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all appropriate"
     maxLabel: "Extremely appropriate"
   - id: cringe
-    questionTemplate: "How \"cringe\" is it for {category} to use meme ads?"
+    questionTemplate: "How \"cringe\" would it be for {category} to use meme ads?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all \"cringe\""
