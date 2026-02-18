@@ -13,7 +13,8 @@ import BatchCategoryRating from "@/components/BatchCategoryRating";
 import TransitionScreen from "@/components/TransitionScreen";
 import FreeResponse from "@/components/FreeResponse";
 import Demographics from "@/components/Demographics";
-import type { StudyConfig } from "@/lib/study-config";
+import type { StudyConfig, Category } from "@/lib/study-config";
+import { normalizeCategories } from "@/lib/study-config";
 
 type Phase =
   | "loading"
@@ -21,16 +22,15 @@ type Phase =
   | "consent"
   | "comprehension"
   | "meme-examples"
+  | "instructions"
+  | "block1-intro"
   | "block1"
   | "transition"
   | "block2"
   | "free-response"
   | "demographics"
-  | "redirect";
-
-function categoryToKey(category: string): string {
-  return category.toLowerCase().replace(/[^a-z0-9]+/g, "_");
-}
+  | "redirect"
+  | "failed-check";
 
 interface StudyClientProps {
   config: StudyConfig;
@@ -47,8 +47,8 @@ export default function StudyClient({ config }: StudyClientProps) {
 
   // Randomization state
   const [dvOrder, setDvOrder] = useState<string[]>([]);
-  const [block1Categories, setBlock1Categories] = useState<string[]>([]);
-  const [block2Categories, setBlock2Categories] = useState<string[]>([]);
+  const [block1Categories, setBlock1Categories] = useState<Category[]>([]);
+  const [block2Categories, setBlock2Categories] = useState<Category[]>([]);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
 
   // Ratings data
@@ -108,9 +108,10 @@ export default function StudyClient({ config }: StudyClientProps) {
     const shuffledDvs = shuffle(dvIds);
     setDvOrder(shuffledDvs);
 
-    // Randomize category order independently for each block
-    setBlock1Categories(shuffle(config.categories));
-    setBlock2Categories(shuffle(config.categories));
+    // Normalize and randomize category order independently for each block
+    const cats = normalizeCategories(config.categories);
+    setBlock1Categories(shuffle(cats));
+    setBlock2Categories(shuffle(cats));
 
     // Initialize ratings structure
     const initialRatings: Record<string, Record<string, number>> = {};
@@ -130,8 +131,8 @@ export default function StudyClient({ config }: StudyClientProps) {
       pid: participantId ?? "",
       cond: condition ?? "",
       dvOrder,
-      block1CategoryOrder: block1Categories,
-      block2CategoryOrder: block2Categories,
+      block1CategoryOrder: block1Categories.map((c) => c.key),
+      block2CategoryOrder: block2Categories.map((c) => c.key),
       ratings,
       timing: {
         totalMs: startTimeRef.current > 0 ? endTime - startTimeRef.current : 0,
@@ -167,6 +168,19 @@ export default function StudyClient({ config }: StudyClientProps) {
     [block1Categories, block2Categories]
   );
 
+  // Substitute {trait} placeholder with the trait label for a given block
+  function substituteTraitLabel(text: string, blockPhase: "block1" | "block2"): string {
+    const dv = getCurrentDv(blockPhase);
+    const traitLabel = dv?.label ?? dv?.id ?? "";
+    return text.replace(/\{trait\}/g, traitLabel);
+  }
+
+  function getBlockIntroText(blockPhase: "block1" | "block2"): string {
+    const template = config.design.blockIntroTemplate;
+    if (!template) return "";
+    return substituteTraitLabel(template, blockPhase);
+  }
+
   // --- Phase transition handlers ---
 
   function handleConsent() {
@@ -191,9 +205,35 @@ export default function StudyClient({ config }: StudyClientProps) {
     }
   }
 
+  function handleComprehensionFail() {
+    setPhase("failed-check");
+  }
+
   function advanceAfterComprehension() {
     if (config.memeExamples) {
       setPhase("meme-examples");
+    } else if (config.instructions) {
+      setPhase("instructions");
+    } else {
+      advanceToBlock1();
+    }
+  }
+
+  function handleMemeExamplesContinue() {
+    if (config.instructions) {
+      setPhase("instructions");
+    } else {
+      advanceToBlock1();
+    }
+  }
+
+  function handleInstructionsContinue() {
+    advanceToBlock1();
+  }
+
+  function advanceToBlock1() {
+    if (config.design.blockIntroTemplate) {
+      setPhase("block1-intro");
     } else {
       startBlock1();
     }
@@ -203,10 +243,6 @@ export default function StudyClient({ config }: StudyClientProps) {
     setCurrentCategoryIndex(0);
     block1StartRef.current = Date.now();
     setPhase("block1");
-  }
-
-  function handleMemeExamplesContinue() {
-    startBlock1();
   }
 
   function advanceAfterBlock2() {
@@ -222,17 +258,16 @@ export default function StudyClient({ config }: StudyClientProps) {
   // Individual rating handler (one category at a time)
   function handleRating(
     blockPhase: "block1" | "block2",
-    category: string,
+    categoryKey: string,
     rating: number
   ) {
     const dvId = dvOrder[blockPhase === "block1" ? 0 : 1];
-    const key = categoryToKey(category);
 
     setRatings((prev) => ({
       ...prev,
       [dvId]: {
         ...prev[dvId],
-        [key]: rating,
+        [categoryKey]: rating,
       },
     }));
 
@@ -314,11 +349,11 @@ export default function StudyClient({ config }: StudyClientProps) {
   // Pre-compute block rendering
   const block1Dv = getCurrentDv("block1");
   const block1Cats = getCurrentCategories("block1");
-  const block1Category = block1Cats[currentCategoryIndex];
+  const block1Cat = block1Cats[currentCategoryIndex];
 
   const block2Dv = getCurrentDv("block2");
   const block2Cats = getCurrentCategories("block2");
-  const block2Category = block2Cats[currentCategoryIndex];
+  const block2Cat = block2Cats[currentCategoryIndex];
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -349,8 +384,26 @@ export default function StudyClient({ config }: StudyClientProps) {
             question={currentCheck.question}
             options={currentCheck.options}
             retryMessage={currentCheck.retryMessage}
+            maxAttempts={currentCheck.maxAttempts}
+            kickWarning={currentCheck.kickWarning}
             onPass={handleComprehensionPass}
+            onFail={handleComprehensionFail}
           />
+        )}
+
+        {phase === "failed-check" && (
+          <div className="flex flex-col items-center gap-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Unable to Continue</h2>
+            <p className="text-zinc-600">
+              Unfortunately, you were unable to correctly answer the
+              comprehension check. You will not be able to participate in
+              this study.
+            </p>
+            <p className="text-zinc-600">
+              Please return the submission on the platform where you received
+              it (e.g., Prolific).
+            </p>
+          </div>
         )}
 
         {phase === "meme-examples" && config.memeExamples && (
@@ -359,6 +412,20 @@ export default function StudyClient({ config }: StudyClientProps) {
             images={config.memeExamples.images}
             minViewingSeconds={config.memeExamples.minViewingSeconds}
             onContinue={handleMemeExamplesContinue}
+          />
+        )}
+
+        {phase === "instructions" && config.instructions && (
+          <TransitionScreen
+            text={config.instructions}
+            onContinue={handleInstructionsContinue}
+          />
+        )}
+
+        {phase === "block1-intro" && (
+          <TransitionScreen
+            text={getBlockIntroText("block1")}
+            onContinue={startBlock1}
           />
         )}
 
@@ -375,10 +442,10 @@ export default function StudyClient({ config }: StudyClientProps) {
           />
         )}
 
-        {phase === "block1" && block1Dv && block1Category && ratingMode !== "batch" && (
+        {phase === "block1" && block1Dv && block1Cat && ratingMode !== "batch" && (
           <CategoryRating
             key={`block1-${currentCategoryIndex}`}
-            category={block1Category}
+            category={block1Cat.label}
             question={block1Dv.questionTemplate}
             scaleMin={block1Dv.scaleMin}
             scaleMax={block1Dv.scaleMax}
@@ -387,14 +454,14 @@ export default function StudyClient({ config }: StudyClientProps) {
             currentIndex={currentCategoryIndex}
             totalCount={block1Cats.length}
             onSubmit={(rating) =>
-              handleRating("block1", block1Category, rating)
+              handleRating("block1", block1Cat.key, rating)
             }
           />
         )}
 
         {phase === "transition" && (
           <TransitionScreen
-            text={config.design.transitionText}
+            text={substituteTraitLabel(config.design.transitionText, "block2")}
             onContinue={handleTransitionContinue}
           />
         )}
@@ -412,10 +479,10 @@ export default function StudyClient({ config }: StudyClientProps) {
           />
         )}
 
-        {phase === "block2" && block2Dv && block2Category && ratingMode !== "batch" && (
+        {phase === "block2" && block2Dv && block2Cat && ratingMode !== "batch" && (
           <CategoryRating
             key={`block2-${currentCategoryIndex}`}
-            category={block2Category}
+            category={block2Cat.label}
             question={block2Dv.questionTemplate}
             scaleMin={block2Dv.scaleMin}
             scaleMax={block2Dv.scaleMax}
@@ -424,7 +491,7 @@ export default function StudyClient({ config }: StudyClientProps) {
             currentIndex={currentCategoryIndex}
             totalCount={block2Cats.length}
             onSubmit={(rating) =>
-              handleRating("block2", block2Category, rating)
+              handleRating("block2", block2Cat.key, rating)
             }
           />
         )}

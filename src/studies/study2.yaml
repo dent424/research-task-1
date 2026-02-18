@@ -5,96 +5,115 @@ study:
 comprehensionChecks:
   - id: brand-personality
     definition: |
-      Brands and product categories can have personality traits, just like
-      people. For example, a luxury fashion brand might seem "sophisticated"
-      and "elegant," while a toy company might seem "playful" and "fun."
-      In this study, you'll rate how characteristic certain personality
-      traits are for different types of companies.
+      Just as people have personality traits, brands and product categories
+      can also be seen as having distinct personality traits. For example,
+      a luxury fashion brand might seem "sophisticated" and "elegant,"
+      while a toy company might seem "playful" and "fun."
     question: "Based on the description above, which of the following best describes brand personality?"
     options:
       - text: "A brand's financial performance and market share"
         correct: false
-      - text: "The human personality traits that consumers associate with a brand or product category"
+      - text: "The personality traits that consumers associate with a brand or product category"
         correct: true
       - text: "The personal opinions of a brand's CEO"
         correct: false
       - text: "The number of employees at a company"
         correct: false
     retryMessage: "That's not quite right. Please re-read the description and try again."
+    maxAttempts: 2
+    kickWarning: "That's not quite right. Please re-read the description carefully. If you answer incorrectly again, you will be asked to return the submission."
+
+instructions: |
+  In this study, you will rate 14 types of companies on two different
+  personality traits.
+
+  For each trait, you will rate how characteristic that trait is for each
+  type of company on a scale from 1 (Not at all characteristic) to 7
+  (Very characteristic).
 
 categories:
-  - A video game company
-  - An amusement park
-  - A snack foods company
-  - A gym
-  - A car company
-  - A wedding planning company
-  - A home renovation company
-  - Public transportation
-  - An airline
-  - An insurance company
-  - A tax preparation company
-  - A financial services company
-  - A healthcare company
-  - A funeral services company
+  - { label: "A video game company", key: "video_games" }
+  - { label: "An amusement park", key: "amusement_park" }
+  - { label: "A snack foods company", key: "snack_foods" }
+  - { label: "A gym", key: "gym" }
+  - { label: "A car company", key: "car" }
+  - { label: "A wedding planning company", key: "wedding_planning" }
+  - { label: "A home renovation company", key: "home_renovation" }
+  - { label: "Public transportation", key: "public_transit" }
+  - { label: "An airline", key: "airline" }
+  - { label: "An insurance company", key: "insurance" }
+  - { label: "A tax preparation company", key: "tax_preparation" }
+  - { label: "A financial services company", key: "financial_services" }
+  - { label: "A healthcare company", key: "healthcare" }
+  - { label: "A funeral services company", key: "funeral_services" }
 
 dependentVariables:
   - id: young
-    questionTemplate: "To what extent is \"young\" characteristic of each of the following types of companies?"
+    label: "young"
+    questionTemplate: "To what extent is \"young\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: trendy
-    questionTemplate: "To what extent is \"trendy\" characteristic of each of the following types of companies?"
+    label: "trendy"
+    questionTemplate: "To what extent is \"trendy\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: responsible
-    questionTemplate: "To what extent is \"responsible\" characteristic of each of the following types of companies?"
+    label: "responsible"
+    questionTemplate: "To what extent is \"responsible\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: stable
-    questionTemplate: "To what extent is \"stable\" characteristic of each of the following types of companies?"
+    label: "stable"
+    questionTemplate: "To what extent is \"stable\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: active
-    questionTemplate: "To what extent is \"active\" characteristic of each of the following types of companies?"
+    label: "active"
+    questionTemplate: "To what extent is \"active\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: corporate
-    questionTemplate: "To what extent is \"corporate\" characteristic of each of the following types of companies?"
+    label: "corporate"
+    questionTemplate: "To what extent is \"corporate\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: innovative
-    questionTemplate: "To what extent is \"innovative\" characteristic of each of the following types of companies?"
+    label: "innovative"
+    questionTemplate: "To what extent is \"innovative\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: upper_class
-    questionTemplate: "To what extent is \"upper class\" characteristic of each of the following types of companies?"
+    label: "upper class"
+    questionTemplate: "To what extent is \"upper class\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: sincere
-    questionTemplate: "To what extent is \"sincere\" characteristic of each of the following types of companies?"
+    label: "sincere"
+    questionTemplate: "To what extent is \"sincere\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: bold
-    questionTemplate: "To what extent is \"bold\" characteristic of each of the following types of companies?"
+    label: "bold"
+    questionTemplate: "To what extent is \"bold\" characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
@@ -104,8 +123,8 @@ design:
   type: between-subjects
   categoryOrder: randomized
   dvBlocking: randomized
-  ratingMode: batch
-  transitionText: "Now you will rate the same types of companies on a different trait."
+  blockIntroTemplate: "You will now rate each type of company on how \"{trait}\" it is."
+  transitionText: "Now you will rate each type of company on how \"{trait}\" it is."
 
 demographics:
   age:

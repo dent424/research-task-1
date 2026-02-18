@@ -13,6 +13,8 @@ export interface ComprehensionCheck {
   question: string;
   options: ComprehensionOption[];
   retryMessage: string;
+  maxAttempts?: number;
+  kickWarning?: string;
 }
 
 export interface MemeExampleImage {
@@ -28,6 +30,7 @@ export interface MemeExamples {
 
 export interface DependentVariable {
   id: string;
+  label?: string;
   questionTemplate: string;
   scaleMin: number;
   scaleMax: number;
@@ -49,6 +52,11 @@ export interface DemographicsConfig {
   gender: { label: string; options: string[] };
 }
 
+export interface Category {
+  label: string;
+  key: string;
+}
+
 export interface StudyConfig {
   study: {
     id: string;
@@ -56,18 +64,33 @@ export interface StudyConfig {
   };
   comprehensionChecks: ComprehensionCheck[];
   memeExamples?: MemeExamples;
-  categories: string[];
+  categories: (string | { label: string; key: string })[];
   dependentVariables: DependentVariable[];
   design: {
     type: string;
     categoryOrder: string;
     dvBlocking: string;
     ratingMode?: string;
+    blockIntroTemplate?: string;
     transitionText: string;
   };
+  instructions?: string;
   freeResponse?: FreeResponseConfig;
   demographics?: DemographicsConfig;
   qualtricsReturnUrl: string;
+}
+
+function categoryToKey(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+}
+
+/** Normalize categories to { label, key } objects. */
+export function normalizeCategories(
+  raw: (string | { label: string; key: string })[]
+): Category[] {
+  return raw.map((c) =>
+    typeof c === "string" ? { label: c, key: categoryToKey(c) } : c
+  );
 }
 
 export function loadStudyConfig(): StudyConfig {

@@ -14,6 +14,9 @@ interface ComprehensionCheckProps {
   options: ComprehensionOption[];
   retryMessage: string;
   onPass: () => void;
+  maxAttempts?: number;
+  kickWarning?: string;
+  onFail?: () => void;
 }
 
 export default function ComprehensionCheck({
@@ -22,9 +25,12 @@ export default function ComprehensionCheck({
   options,
   retryMessage,
   onPass,
+  maxAttempts,
+  kickWarning,
+  onFail,
 }: ComprehensionCheckProps) {
   const [selected, setSelected] = useState<number | null>(null);
-  const [showRetry, setShowRetry] = useState(false);
+  const [wrongCount, setWrongCount] = useState(0);
 
   const shuffledOptions = useMemo(() => shuffleWithIndex(options), [options]);
 
@@ -33,10 +39,16 @@ export default function ComprehensionCheck({
     if (shuffledOptions[selected].item.correct) {
       onPass();
     } else {
-      setShowRetry(true);
+      const newWrongCount = wrongCount + 1;
+      setWrongCount(newWrongCount);
       setSelected(null);
+      if (maxAttempts && newWrongCount >= maxAttempts && onFail) {
+        onFail();
+      }
     }
   }
+
+  const showWarning = kickWarning && maxAttempts && wrongCount === maxAttempts - 1;
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl text-left">
@@ -46,9 +58,15 @@ export default function ComprehensionCheck({
 
       <h3 className="text-lg font-medium">{question}</h3>
 
-      {showRetry && (
+      {wrongCount > 0 && !showWarning && (
         <p className="text-red-600 font-medium">
           {retryMessage}
+        </p>
+      )}
+
+      {showWarning && (
+        <p className="text-red-600 font-medium">
+          {kickWarning}
         </p>
       )}
 
@@ -58,7 +76,6 @@ export default function ComprehensionCheck({
             key={entry.originalIndex}
             onClick={() => {
               setSelected(index);
-              setShowRetry(false);
             }}
             className={`text-left px-4 py-3 rounded-lg border-2 transition-colors ${
               selected === index

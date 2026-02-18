@@ -1,19 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import type { Category } from "@/lib/study-config";
 
 interface BatchCategoryRatingProps {
-  categories: string[];
+  categories: Category[];
   question: string;
   scaleMin: number;
   scaleMax: number;
   minLabel: string;
   maxLabel: string;
   onSubmit: (ratings: Record<string, number>) => void;
-}
-
-function categoryToKey(category: string): string {
-  return category.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 }
 
 export default function BatchCategoryRating({
@@ -26,14 +23,14 @@ export default function BatchCategoryRating({
   onSubmit,
 }: BatchCategoryRatingProps) {
   const [ratings, setRatings] = useState<Record<string, number | null>>(() =>
-    Object.fromEntries(categories.map((c) => [categoryToKey(c), null]))
+    Object.fromEntries(categories.map((c) => [c.key, null]))
   );
 
   const points = Array.from(
     { length: scaleMax - scaleMin + 1 },
     (_, i) => scaleMin + i
   );
-  const allRated = categories.every((c) => ratings[categoryToKey(c)] !== null);
+  const allRated = categories.every((c) => ratings[c.key] !== null);
 
   function handleRate(categoryKey: string, value: number) {
     setRatings((prev) => ({ ...prev, [categoryKey]: value }));
@@ -74,34 +71,31 @@ export default function BatchCategoryRating({
         </div>
 
         {/* Category rows */}
-        {categories.map((category) => {
-          const key = categoryToKey(category);
-          return (
-            <div
-              key={key}
-              className="flex items-center py-3 border-t border-zinc-100"
-            >
-              <span className="w-52 shrink-0 text-sm font-medium pr-4 text-left">
-                {category}
-              </span>
-              <div className="flex-1 flex justify-between">
-                {points.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => handleRate(key, p)}
-                    className={`w-10 h-10 rounded-full border-2 text-sm transition-colors ${
-                      ratings[key] === p
-                        ? "bg-foreground text-background border-foreground"
-                        : "border-zinc-300 hover:border-zinc-500"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
+        {categories.map((category) => (
+          <div
+            key={category.key}
+            className="flex items-center py-3 border-t border-zinc-100"
+          >
+            <span className="w-52 shrink-0 text-sm font-medium pr-4 text-left">
+              {category.label}
+            </span>
+            <div className="flex-1 flex justify-between">
+              {points.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handleRate(category.key, p)}
+                  className={`w-10 h-10 rounded-full border-2 text-sm transition-colors ${
+                    ratings[category.key] === p
+                      ? "bg-foreground text-background border-foreground"
+                      : "border-zinc-300 hover:border-zinc-500"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <button
