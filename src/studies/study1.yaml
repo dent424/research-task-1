@@ -48,11 +48,11 @@ memeExamples:
     audiences on social media. Below are three real examples of brands
     using memes in their ads.
   images:
-    - src: /stimuli/Bumble.jpeg
+    - src: /images/study1/Bumble.jpeg
       alt: "Bumble dating app meme ad using Barbie movie format"
-    - src: /stimuli/Drake.png
+    - src: /images/study1/Drake.png
       alt: "Resparked gift shop ad using Drake meme format"
-    - src: /stimuli/Ruffles.png
+    - src: /images/study1/Ruffles.png
       alt: "Ruffles snack brand meme ad using classic painting format"
 
 categories:

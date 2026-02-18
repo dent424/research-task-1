@@ -1,0 +1,122 @@
+study:
+  id: study2
+  title: Study 2
+
+comprehensionChecks:
+  - id: brand-personality
+    definition: |
+      Brands and product categories can have personality traits, just like
+      people. For example, a luxury fashion brand might seem "sophisticated"
+      and "elegant," while a toy company might seem "playful" and "fun."
+      In this study, you'll rate how characteristic certain personality
+      traits are for different types of companies.
+    question: "Based on the description above, which of the following best describes brand personality?"
+    options:
+      - text: "A brand's financial performance and market share"
+        correct: false
+      - text: "The human personality traits that consumers associate with a brand or product category"
+        correct: true
+      - text: "The personal opinions of a brand's CEO"
+        correct: false
+      - text: "The number of employees at a company"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the description and try again."
+
+categories:
+  - A video game company
+  - An amusement park
+  - A snack foods company
+  - A gym
+  - A car company
+  - A wedding planning company
+  - A home renovation company
+  - Public transportation
+  - An airline
+  - An insurance company
+  - A tax preparation company
+  - A financial services company
+  - A healthcare company
+  - A funeral services company
+
+dependentVariables:
+  - id: young
+    questionTemplate: "To what extent is \"young\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: trendy
+    questionTemplate: "To what extent is \"trendy\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: responsible
+    questionTemplate: "To what extent is \"responsible\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: stable
+    questionTemplate: "To what extent is \"stable\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: active
+    questionTemplate: "To what extent is \"active\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: corporate
+    questionTemplate: "To what extent is \"corporate\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: innovative
+    questionTemplate: "To what extent is \"innovative\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: upper_class
+    questionTemplate: "To what extent is \"upper class\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: sincere
+    questionTemplate: "To what extent is \"sincere\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+  - id: bold
+    questionTemplate: "To what extent is \"bold\" characteristic of each of the following types of companies?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all characteristic"
+    maxLabel: "Very characteristic"
+
+design:
+  type: between-subjects
+  categoryOrder: randomized
+  dvBlocking: randomized
+  ratingMode: batch
+  transitionText: "Now you will rate the same types of companies on a different trait."
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_PLACEHOLDER"

@@ -55,13 +55,14 @@ export interface StudyConfig {
     title: string;
   };
   comprehensionChecks: ComprehensionCheck[];
-  memeExamples: MemeExamples;
+  memeExamples?: MemeExamples;
   categories: string[];
   dependentVariables: DependentVariable[];
   design: {
     type: string;
     categoryOrder: string;
     dvBlocking: string;
+    ratingMode?: string;
     transitionText: string;
   };
   freeResponse?: FreeResponseConfig;
@@ -70,7 +71,20 @@ export interface StudyConfig {
 }
 
 export function loadStudyConfig(): StudyConfig {
-  const configPath = path.join(process.cwd(), "src", "study-config.yaml");
+  const activeStudy = process.env.ACTIVE_STUDY;
+  if (!activeStudy) {
+    throw new Error(
+      "ACTIVE_STUDY environment variable is not set. " +
+        "Set it to a study name (e.g. ACTIVE_STUDY=study1) in .env.local or Vercel project settings."
+    );
+  }
+  const configPath = path.join(process.cwd(), "src", "studies", `${activeStudy}.yaml`);
+  if (!fs.existsSync(configPath)) {
+    throw new Error(
+      `Study config not found: src/studies/${activeStudy}.yaml. ` +
+        "Check that ACTIVE_STUDY matches a file in src/studies/."
+    );
+  }
   const fileContents = fs.readFileSync(configPath, "utf8");
   return yaml.load(fileContents) as StudyConfig;
 }

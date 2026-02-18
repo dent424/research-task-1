@@ -9,6 +9,7 @@ import ConsentForm from "@/components/ConsentForm";
 import ComprehensionCheck from "@/components/ComprehensionCheck";
 import MemeExamples from "@/components/MemeExamples";
 import CategoryRating from "@/components/CategoryRating";
+import BatchCategoryRating from "@/components/BatchCategoryRating";
 import TransitionScreen from "@/components/TransitionScreen";
 import FreeResponse from "@/components/FreeResponse";
 import Demographics from "@/components/Demographics";
@@ -18,8 +19,7 @@ type Phase =
   | "loading"
   | "already-completed"
   | "consent"
-  | "comprehension-cringe"
-  | "comprehension-meme"
+  | "comprehension"
   | "meme-examples"
   | "block1"
   | "transition"
@@ -41,6 +41,9 @@ export default function StudyClient({ config }: StudyClientProps) {
   const [participantId, setParticipantId] = useState<string | null>(null);
   const [condition, setCondition] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
+
+  // Comprehension check progress
+  const [comprehensionIndex, setComprehensionIndex] = useState(0);
 
   // Randomization state
   const [dvOrder, setDvOrder] = useState<string[]>([]);
@@ -70,11 +73,12 @@ export default function StudyClient({ config }: StudyClientProps) {
   const studyDataRef = useRef<Record<string, unknown>>({});
 
   const completedKey = `${config.study.id}_completed`;
+  const ratingMode = config.design.ratingMode ?? "individual";
 
   // Scroll to top on phase changes
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [phase, currentCategoryIndex]);
+  }, [phase, currentCategoryIndex, comprehensionIndex]);
 
   useEffect(() => {
     // Check if participant already completed this study
@@ -91,8 +95,16 @@ export default function StudyClient({ config }: StudyClientProps) {
     setParticipantId(pid);
     setCondition(cond);
 
+    // Select DVs based on design type
+    let dvIds: string[];
+    if (config.design.type === "between-subjects" && cond) {
+      const indices = cond.split(",").map(Number);
+      dvIds = indices.map((i) => config.dependentVariables[i].id);
+    } else {
+      dvIds = config.dependentVariables.map((dv) => dv.id);
+    }
+
     // Randomize DV order
-    const dvIds = config.dependentVariables.map((dv) => dv.id);
     const shuffledDvs = shuffle(dvIds);
     setDvOrder(shuffledDvs);
 
@@ -114,7 +126,7 @@ export default function StudyClient({ config }: StudyClientProps) {
   // Keep studyDataRef in sync with latest state
   useEffect(() => {
     const endTime = Date.now();
-    studyDataRef.current = {
+    const data: Record<string, unknown> = {
       pid: participantId ?? "",
       cond: condition ?? "",
       dvOrder,
@@ -134,6 +146,9 @@ export default function StudyClient({ config }: StudyClientProps) {
       },
       completed: true,
     };
+    if (ageRef.current) data.age = ageRef.current;
+    if (genderRef.current) data.gender = genderRef.current;
+    studyDataRef.current = data;
   });
 
   const getCurrentDv = useCallback(
@@ -152,28 +167,59 @@ export default function StudyClient({ config }: StudyClientProps) {
     [block1Categories, block2Categories]
   );
 
+  // --- Phase transition handlers ---
+
   function handleConsent() {
-    setPhase("comprehension-cringe");
+    if (config.comprehensionChecks.length > 0) {
+      setComprehensionIndex(0);
+      setPhase("comprehension");
+    } else {
+      advanceAfterComprehension();
+    }
   }
 
   function handleDecline() {
     router.push("/no-consent");
   }
 
-  function handleComprehensionCringePass() {
-    setPhase("comprehension-meme");
+  function handleComprehensionPass() {
+    const nextIndex = comprehensionIndex + 1;
+    if (nextIndex < config.comprehensionChecks.length) {
+      setComprehensionIndex(nextIndex);
+    } else {
+      advanceAfterComprehension();
+    }
   }
 
-  function handleComprehensionMemePass() {
-    setPhase("meme-examples");
+  function advanceAfterComprehension() {
+    if (config.memeExamples) {
+      setPhase("meme-examples");
+    } else {
+      startBlock1();
+    }
   }
 
-  function handleMemeExamplesContinue() {
+  function startBlock1() {
     setCurrentCategoryIndex(0);
     block1StartRef.current = Date.now();
     setPhase("block1");
   }
 
+  function handleMemeExamplesContinue() {
+    startBlock1();
+  }
+
+  function advanceAfterBlock2() {
+    if (config.freeResponse) {
+      setPhase("free-response");
+    } else if (config.demographics) {
+      setPhase("demographics");
+    } else {
+      setPhase("redirect");
+    }
+  }
+
+  // Individual rating handler (one category at a time)
   function handleRating(
     blockPhase: "block1" | "block2",
     category: string,
@@ -198,14 +244,25 @@ export default function StudyClient({ config }: StudyClientProps) {
     } else if (blockPhase === "block1") {
       setPhase("transition");
     } else {
-      // block2 done — advance to free-response, demographics, or redirect
-      if (config.freeResponse) {
-        setPhase("free-response");
-      } else if (config.demographics) {
-        setPhase("demographics");
-      } else {
-        setPhase("redirect");
-      }
+      advanceAfterBlock2();
+    }
+  }
+
+  // Batch rating handler (all categories at once)
+  function handleBatchRating(
+    blockPhase: "block1" | "block2",
+    allRatings: Record<string, number>
+  ) {
+    const dvId = dvOrder[blockPhase === "block1" ? 0 : 1];
+    setRatings((prev) => ({
+      ...prev,
+      [dvId]: allRatings,
+    }));
+
+    if (blockPhase === "block1") {
+      setPhase("transition");
+    } else {
+      advanceAfterBlock2();
     }
   }
 
@@ -251,11 +308,8 @@ export default function StudyClient({ config }: StudyClientProps) {
     redirectWithEncodedData(config.qualtricsReturnUrl, studyDataRef.current, extra);
   }, [phase, completedKey, config.qualtricsReturnUrl]);
 
-  // Find comprehension check configs
-  const cringeCheck = config.comprehensionChecks.find(
-    (c) => c.id === "cringe"
-  );
-  const memeCheck = config.comprehensionChecks.find((c) => c.id === "meme");
+  // Current comprehension check
+  const currentCheck = config.comprehensionChecks[comprehensionIndex];
 
   // Pre-compute block rendering
   const block1Dv = getCurrentDv("block1");
@@ -288,29 +342,18 @@ export default function StudyClient({ config }: StudyClientProps) {
           <ConsentForm onAgree={handleConsent} onDecline={handleDecline} />
         )}
 
-        {phase === "comprehension-cringe" && cringeCheck && (
+        {phase === "comprehension" && currentCheck && (
           <ComprehensionCheck
-            key="cringe"
-            definition={cringeCheck.definition}
-            question={cringeCheck.question}
-            options={cringeCheck.options}
-            retryMessage={cringeCheck.retryMessage}
-            onPass={handleComprehensionCringePass}
+            key={currentCheck.id}
+            definition={currentCheck.definition}
+            question={currentCheck.question}
+            options={currentCheck.options}
+            retryMessage={currentCheck.retryMessage}
+            onPass={handleComprehensionPass}
           />
         )}
 
-        {phase === "comprehension-meme" && memeCheck && (
-          <ComprehensionCheck
-            key="meme"
-            definition={memeCheck.definition}
-            question={memeCheck.question}
-            options={memeCheck.options}
-            retryMessage={memeCheck.retryMessage}
-            onPass={handleComprehensionMemePass}
-          />
-        )}
-
-        {phase === "meme-examples" && (
+        {phase === "meme-examples" && config.memeExamples && (
           <MemeExamples
             introduction={config.memeExamples.introduction}
             images={config.memeExamples.images}
@@ -319,7 +362,20 @@ export default function StudyClient({ config }: StudyClientProps) {
           />
         )}
 
-        {phase === "block1" && block1Dv && block1Category && (
+        {phase === "block1" && block1Dv && ratingMode === "batch" && (
+          <BatchCategoryRating
+            key="block1-batch"
+            categories={block1Cats}
+            question={block1Dv.questionTemplate}
+            scaleMin={block1Dv.scaleMin}
+            scaleMax={block1Dv.scaleMax}
+            minLabel={block1Dv.minLabel}
+            maxLabel={block1Dv.maxLabel}
+            onSubmit={(allRatings) => handleBatchRating("block1", allRatings)}
+          />
+        )}
+
+        {phase === "block1" && block1Dv && block1Category && ratingMode !== "batch" && (
           <CategoryRating
             key={`block1-${currentCategoryIndex}`}
             category={block1Category}
@@ -343,7 +399,20 @@ export default function StudyClient({ config }: StudyClientProps) {
           />
         )}
 
-        {phase === "block2" && block2Dv && block2Category && (
+        {phase === "block2" && block2Dv && ratingMode === "batch" && (
+          <BatchCategoryRating
+            key="block2-batch"
+            categories={block2Cats}
+            question={block2Dv.questionTemplate}
+            scaleMin={block2Dv.scaleMin}
+            scaleMax={block2Dv.scaleMax}
+            minLabel={block2Dv.minLabel}
+            maxLabel={block2Dv.maxLabel}
+            onSubmit={(allRatings) => handleBatchRating("block2", allRatings)}
+          />
+        )}
+
+        {phase === "block2" && block2Dv && block2Category && ratingMode !== "batch" && (
           <CategoryRating
             key={`block2-${currentCategoryIndex}`}
             category={block2Category}
