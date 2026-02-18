@@ -14,7 +14,18 @@ import TransitionScreen from "@/components/TransitionScreen";
 import FreeResponse from "@/components/FreeResponse";
 import Demographics from "@/components/Demographics";
 import type { StudyConfig, Category } from "@/lib/study-config";
-import { normalizeCategories } from "@/lib/study-config";
+
+function categoryToKey(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+}
+
+function normalizeCategories(
+  raw: (string | { label: string; key: string })[]
+): Category[] {
+  return raw.map((c) =>
+    typeof c === "string" ? { label: c, key: categoryToKey(c) } : c
+  );
+}
 
 type Phase =
   | "loading"
