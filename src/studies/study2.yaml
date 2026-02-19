@@ -50,70 +50,70 @@ categories:
 dependentVariables:
   - id: young
     label: "young"
-    questionTemplate: "To what extent is \"young\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"young\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: trendy
     label: "trendy"
-    questionTemplate: "To what extent is \"trendy\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"trendy\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: responsible
     label: "responsible"
-    questionTemplate: "To what extent is \"responsible\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"responsible\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: stable
     label: "stable"
-    questionTemplate: "To what extent is \"stable\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"stable\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: active
     label: "active"
-    questionTemplate: "To what extent is \"active\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"active\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: corporate
     label: "corporate"
-    questionTemplate: "To what extent is \"corporate\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"corporate\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: innovative
     label: "innovative"
-    questionTemplate: "To what extent is \"innovative\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"innovative\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: upper_class
     label: "upper class"
-    questionTemplate: "To what extent is \"upper class\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"upper class\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: sincere
     label: "sincere"
-    questionTemplate: "To what extent is \"sincere\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"sincere\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"
     maxLabel: "Very characteristic"
   - id: bold
     label: "bold"
-    questionTemplate: "To what extent is \"bold\" characteristic of {category}?"
+    questionTemplate: "To what extent is **\"bold\"** characteristic of {category}?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all characteristic"

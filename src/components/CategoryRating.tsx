@@ -3,6 +3,16 @@
 import { useState } from "react";
 import LikertScale from "./LikertScale";
 
+function renderBoldText(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 interface CategoryRatingProps {
   category: string;
   question: string;
@@ -38,9 +48,9 @@ export default function CategoryRating({
       </p>
 
       <h3 className="text-lg font-medium text-center">
-        {parts[0]}
+        {renderBoldText(parts[0])}
         <span className="font-bold underline">{displayCategory}</span>
-        {parts[1]}
+        {renderBoldText(parts[1])}
       </h3>
 
       <LikertScale

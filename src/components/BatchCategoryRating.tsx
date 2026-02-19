@@ -3,6 +3,16 @@
 import { useState } from "react";
 import type { Category } from "@/lib/study-config";
 
+function renderBoldText(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 interface BatchCategoryRatingProps {
   categories: Category[];
   question: string;
@@ -43,7 +53,7 @@ export default function BatchCategoryRating({
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-3xl">
-      <h3 className="text-lg font-medium text-center">{question}</h3>
+      <h3 className="text-lg font-medium text-center">{renderBoldText(question)}</h3>
 
       <div className="w-full">
         {/* Scale header */}
