@@ -123,8 +123,8 @@ design:
   type: between-subjects
   categoryOrder: randomized
   dvBlocking: randomized
-  blockIntroTemplate: "You will now rate each type of company on how \"{trait}\" it is."
-  transitionText: "Now you will rate each type of company on how \"{trait}\" it is."
+  blockIntroTemplate: "You will now rate each type of company on how **\"{trait}\"** it is."
+  transitionText: "Now you will rate each type of company on how **\"{trait}\"** it is."
 
 demographics:
   age:

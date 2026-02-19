@@ -1,5 +1,15 @@
 "use client";
 
+function renderBoldText(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
 interface TransitionScreenProps {
   text: string;
   onContinue: () => void;
@@ -12,7 +22,7 @@ export default function TransitionScreen({
   return (
     <div className="flex flex-col items-center gap-8 max-w-2xl">
       <p className="text-lg text-center text-zinc-700 leading-relaxed">
-        {text}
+        {renderBoldText(text)}
       </p>
 
       <button
