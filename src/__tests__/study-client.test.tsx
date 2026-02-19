@@ -27,6 +27,26 @@ vi.mock("@/lib/params", () => ({
   }),
 }));
 
+// Mock redirectWithEncodedData to capture redirect data instead of navigating.
+// jsdom makes window.location non-configurable, so we cannot stub it.
+let lastRedirectUrl = "";
+let lastRedirectData: Record<string, unknown> = {};
+let lastRedirectExtra: Record<string, string> = {};
+
+vi.mock("@/lib/redirect", () => ({
+  redirectWithEncodedData: vi.fn(
+    (
+      url: string,
+      data: Record<string, unknown>,
+      extra?: Record<string, string>
+    ) => {
+      lastRedirectUrl = url;
+      lastRedirectData = { ...data };
+      lastRedirectExtra = extra ? { ...extra } : {};
+    }
+  ),
+}));
+
 // ---------------------------------------------------------------------------
 // Mock config (2 categories for speed)
 // ---------------------------------------------------------------------------
@@ -62,6 +82,7 @@ const mockConfig: StudyConfig = {
   memeExamples: {
     introduction: "Test intro",
     images: [{ src: "/test.png", alt: "test" }],
+    minViewingSeconds: 0,
   },
   categories: ["Category A", "Category B"],
   dependentVariables: [
@@ -90,6 +111,23 @@ const mockConfig: StudyConfig = {
   },
   qualtricsReturnUrl: "https://test.qualtrics.com/jfe/form/SV_TEST",
 };
+
+// ---------------------------------------------------------------------------
+// Custom text matcher for split-element text
+// ---------------------------------------------------------------------------
+
+// RTL's getByText only checks direct text nodes, not textContent across child
+// elements. CategoryRating renders the category name in a <span> child, so we
+// need a custom matcher. Restrict to <h3> to avoid matching ancestor elements.
+function headingMatching(regex: RegExp) {
+  return (_: string, element: Element | null): boolean => {
+    return (
+      element !== null &&
+      element.tagName === "H3" &&
+      regex.test(element.textContent ?? "")
+    );
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -174,6 +212,18 @@ async function completeEntireStudy() {
   await rateCategory(2);
 }
 
+/** Wait for the redirect mock to have captured data. */
+async function waitForRedirect() {
+  await waitFor(() => {
+    expect(
+      screen.getByText("Submitting your responses...")
+    ).toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(Object.keys(lastRedirectData).length).toBeGreaterThan(0);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Setup / teardown
 // ---------------------------------------------------------------------------
@@ -181,9 +231,10 @@ async function completeEntireStudy() {
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
+  lastRedirectUrl = "";
+  lastRedirectData = {};
+  lastRedirectExtra = {};
 
-  // Stub window.location and window.scrollTo for the study component
-  vi.stubGlobal("location", { href: "", search: "?pid=P001&cond=treatment" });
   vi.stubGlobal("scrollTo", vi.fn());
 });
 
@@ -314,10 +365,9 @@ describe("StudyClient", () => {
 
       await waitFor(() => {
         expect(screen.getByText("1 of 2")).toBeInTheDocument();
-        // The first DV (appropriateness, since shuffle is identity) applied
-        // to the first category (Category A)
+        // CategoryRating lowercases first char: "Category A" → "category A"
         expect(
-          screen.getByText("How appropriate is Category A?")
+          screen.getByText(headingMatching(/How appropriate is category A\?/))
         ).toBeInTheDocument();
       });
     });
@@ -336,7 +386,7 @@ describe("StudyClient", () => {
       await waitFor(() => {
         expect(screen.getByText("2 of 2")).toBeInTheDocument();
         expect(
-          screen.getByText("How appropriate is Category B?")
+          screen.getByText(headingMatching(/How appropriate is category B\?/))
         ).toBeInTheDocument();
       });
     });
@@ -408,7 +458,7 @@ describe("StudyClient", () => {
       await waitFor(() => {
         expect(screen.getByText("1 of 2")).toBeInTheDocument();
         expect(
-          screen.getByText("How cringe is Category A?")
+          screen.getByText(headingMatching(/How cringe is category A\?/))
         ).toBeInTheDocument();
       });
     });
@@ -501,20 +551,14 @@ describe("StudyClient", () => {
   // -----------------------------------------------------------------
 
   describe("data encoding in redirect URL", () => {
-    it("redirect URL contains pid and data query params", async () => {
+    it("redirect data contains pid", async () => {
       await act(async () => {
         render(<StudyClient config={mockConfig} />);
       });
       await completeEntireStudy();
+      await waitForRedirect();
 
-      await waitFor(() => {
-        expect(window.location.href).toBeTruthy();
-      });
-
-      const url = new URL(window.location.href);
-      expect(url.searchParams.has("pid")).toBe(true);
-      expect(url.searchParams.get("pid")).toBe("P001");
-      expect(url.searchParams.has("data")).toBe(true);
+      expect(lastRedirectData.pid).toBe("P001");
     });
 
     it("redirect URL points to the configured Qualtrics return URL", async () => {
@@ -522,76 +566,62 @@ describe("StudyClient", () => {
         render(<StudyClient config={mockConfig} />);
       });
       await completeEntireStudy();
+      await waitForRedirect();
 
-      await waitFor(() => {
-        expect(window.location.href).toBeTruthy();
-      });
-
-      const url = new URL(window.location.href);
-      expect(url.origin + url.pathname).toBe(
+      expect(lastRedirectUrl).toBe(
         "https://test.qualtrics.com/jfe/form/SV_TEST"
       );
     });
 
-    it("Base64-decoded data contains expected structure", async () => {
+    it("redirect data contains expected structure", async () => {
       await act(async () => {
         render(<StudyClient config={mockConfig} />);
       });
       await completeEntireStudy();
-
-      await waitFor(() => {
-        expect(window.location.href).toBeTruthy();
-      });
-
-      const url = new URL(window.location.href);
-      const encoded = url.searchParams.get("data")!;
-
-      // Decode the Base64 string the same way the Python decoder does
-      const binaryStr = atob(encoded);
-      const bytes = new Uint8Array(binaryStr.length);
-      for (let i = 0; i < binaryStr.length; i++) {
-        bytes[i] = binaryStr.charCodeAt(i);
-      }
-      const jsonString = new TextDecoder().decode(bytes);
-      const data = JSON.parse(jsonString);
+      await waitForRedirect();
 
       // Verify top-level fields
-      expect(data.pid).toBe("P001");
-      expect(data.cond).toBe("treatment");
-      expect(data.completed).toBe(true);
+      expect(lastRedirectData.pid).toBe("P001");
+      expect(lastRedirectData.cond).toBe("treatment");
+      expect(lastRedirectData.completed).toBe(true);
 
       // dvOrder should contain both DV ids
-      expect(data.dvOrder).toEqual(
+      expect(lastRedirectData.dvOrder).toEqual(
         expect.arrayContaining(["appropriateness", "cringe"])
       );
-      expect(data.dvOrder).toHaveLength(2);
+      expect(lastRedirectData.dvOrder).toHaveLength(2);
 
-      // Category orders should contain both categories
-      expect(data.block1CategoryOrder).toEqual(
-        expect.arrayContaining(["Category A", "Category B"])
+      // Category orders should contain both category keys
+      expect(lastRedirectData.block1CategoryOrder).toEqual(
+        expect.arrayContaining(["category_a", "category_b"])
       );
-      expect(data.block2CategoryOrder).toEqual(
-        expect.arrayContaining(["Category A", "Category B"])
+      expect(lastRedirectData.block2CategoryOrder).toEqual(
+        expect.arrayContaining(["category_a", "category_b"])
       );
 
       // Ratings should have entries for each DV
-      expect(data.ratings).toHaveProperty("appropriateness");
-      expect(data.ratings).toHaveProperty("cringe");
+      const ratings = lastRedirectData.ratings as Record<
+        string,
+        Record<string, number>
+      >;
+      expect(ratings).toHaveProperty("appropriateness");
+      expect(ratings).toHaveProperty("cringe");
 
       // Check that actual rating values are present
       // Block1 used first DV (appropriateness): rated 5 and 3
-      expect(data.ratings.appropriateness.category_a).toBe(5);
-      expect(data.ratings.appropriateness.category_b).toBe(3);
+      expect(ratings.appropriateness.category_a).toBe(5);
+      expect(ratings.appropriateness.category_b).toBe(3);
 
       // Block2 used second DV (cringe): rated 6 and 2
-      expect(data.ratings.cringe.category_a).toBe(6);
-      expect(data.ratings.cringe.category_b).toBe(2);
+      expect(ratings.cringe.category_a).toBe(6);
+      expect(ratings.cringe.category_b).toBe(2);
 
       // Timing data should exist
-      expect(data.timing).toBeDefined();
-      expect(typeof data.timing.totalMs).toBe("number");
-      expect(typeof data.timing.block1Ms).toBe("number");
-      expect(typeof data.timing.block2Ms).toBe("number");
+      const timing = lastRedirectData.timing as Record<string, number>;
+      expect(timing).toBeDefined();
+      expect(typeof timing.totalMs).toBe("number");
+      expect(typeof timing.block1Ms).toBe("number");
+      expect(typeof timing.block2Ms).toBe("number");
     });
 
     it("ratings use the categoryToKey transform (lowercase, underscores)", async () => {
@@ -599,23 +629,15 @@ describe("StudyClient", () => {
         render(<StudyClient config={mockConfig} />);
       });
       await completeEntireStudy();
+      await waitForRedirect();
 
-      await waitFor(() => {
-        expect(window.location.href).toBeTruthy();
-      });
-
-      const url = new URL(window.location.href);
-      const encoded = url.searchParams.get("data")!;
-      const binaryStr = atob(encoded);
-      const bytes = new Uint8Array(binaryStr.length);
-      for (let i = 0; i < binaryStr.length; i++) {
-        bytes[i] = binaryStr.charCodeAt(i);
-      }
-      const jsonString = new TextDecoder().decode(bytes);
-      const data = JSON.parse(jsonString);
+      const ratings = lastRedirectData.ratings as Record<
+        string,
+        Record<string, number>
+      >;
 
       // "Category A" -> "category_a", "Category B" -> "category_b"
-      const appropriatenessKeys = Object.keys(data.ratings.appropriateness);
+      const appropriatenessKeys = Object.keys(ratings.appropriateness);
       expect(appropriatenessKeys).toContain("category_a");
       expect(appropriatenessKeys).toContain("category_b");
 

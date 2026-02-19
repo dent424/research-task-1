@@ -289,3 +289,209 @@ describe("decoder.py compatibility (structural verification)", () => {
     expect(flat["cringe_video_games"]).toBe(6);
   });
 });
+
+describe("Study 2 decoder.py compatibility", () => {
+  /** Replicate Study 2 decoder.py decode_row logic in JS. */
+  function flattenStudy2Row(
+    data: Record<string, unknown>
+  ): Record<string, unknown> {
+    const flat: Record<string, unknown> = {
+      pid: data.pid ?? "",
+      cond: data.cond ?? "",
+      traitOrder: ((data.dvOrder as string[]) ?? []).join("|"),
+      trait1_order: ((data.block1CategoryOrder as string[]) ?? []).join("|"),
+      trait2_order: ((data.block2CategoryOrder as string[]) ?? []).join("|"),
+      completed: data.completed ?? false,
+      age: data.age ?? "",
+      gender: data.gender ?? "",
+    };
+
+    const timing = (data.timing as Record<string, number>) ?? {};
+    flat.timing_total_ms = timing.totalMs ?? "";
+    flat.timing_block1_ms = timing.block1Ms ?? "";
+    flat.timing_block2_ms = timing.block2Ms ?? "";
+
+    const ratings =
+      (data.ratings as Record<string, Record<string, number>>) ?? {};
+    for (const traitId of Object.keys(ratings).sort()) {
+      const categoryRatings = ratings[traitId];
+      for (const catKey of Object.keys(categoryRatings).sort()) {
+        flat[`${traitId}_${catKey}`] = categoryRatings[catKey];
+      }
+    }
+
+    return flat;
+  }
+
+  const STUDY2_CATEGORIES = [
+    "video_games",
+    "amusement_park",
+    "snack_foods",
+    "gym",
+    "car",
+    "wedding_planning",
+    "home_renovation",
+    "public_transit",
+    "airline",
+    "insurance",
+    "tax_preparation",
+    "financial_services",
+    "healthcare",
+    "funeral_services",
+  ];
+
+  const META_COLUMNS = [
+    "pid",
+    "cond",
+    "traitOrder",
+    "trait1_order",
+    "trait2_order",
+    "timing_total_ms",
+    "timing_block1_ms",
+    "timing_block2_ms",
+    "completed",
+    "age",
+    "gender",
+  ];
+
+  it("structure test: traitOrder, trait orders, age, gender, 28 rating columns", () => {
+    // Build ratings for 2 traits (young, active) × 14 categories
+    const youngRatings: Record<string, number> = {};
+    const activeRatings: Record<string, number> = {};
+    STUDY2_CATEGORIES.forEach((cat, i) => {
+      youngRatings[cat] = (i % 7) + 1;
+      activeRatings[cat] = ((i + 3) % 7) + 1;
+    });
+
+    const studyData = {
+      pid: "P100",
+      cond: "0,4",
+      dvOrder: ["young", "active"],
+      block1CategoryOrder: STUDY2_CATEGORIES,
+      block2CategoryOrder: [...STUDY2_CATEGORIES].reverse(),
+      ratings: {
+        young: youngRatings,
+        active: activeRatings,
+      },
+      timing: {
+        totalMs: 180000,
+        block1Ms: 90000,
+        block2Ms: 85000,
+      },
+      completed: true,
+      age: "22",
+      gender: "Woman",
+    };
+
+    const encoded = toBase64(JSON.stringify(studyData));
+    const decoded = JSON.parse(fromBase64(encoded));
+    const flat = flattenStudy2Row(decoded);
+
+    // Verify renamed column: dvOrder → traitOrder
+    expect(flat.traitOrder).toBe("young|active");
+
+    // Verify renamed columns: block orders → trait1_order / trait2_order
+    expect(flat.trait1_order).toBe(STUDY2_CATEGORIES.join("|"));
+    expect(flat.trait2_order).toBe([...STUDY2_CATEGORIES].reverse().join("|"));
+
+    // Verify age and gender come from blob (not separate CSV columns)
+    expect(flat.age).toBe("22");
+    expect(flat.gender).toBe("Woman");
+
+    // Verify 28 rating columns (2 traits × 14 categories)
+    const ratingKeys = Object.keys(flat).filter(
+      (k) => !META_COLUMNS.includes(k)
+    );
+    expect(ratingKeys).toHaveLength(28);
+
+    // Spot-check rating values
+    expect(flat.young_video_games).toBe(youngRatings.video_games);
+    expect(flat.active_funeral_services).toBe(activeRatings.funeral_services);
+    expect(flat.young_snack_foods).toBe(youngRatings.snack_foods);
+    expect(flat.active_airline).toBe(activeRatings.airline);
+  });
+
+  it("sparse between-subjects: two participants produce 56 union columns", () => {
+    // Participant 1: young + active (cond="0,4")
+    const p1Ratings: Record<string, Record<string, number>> = {
+      young: {},
+      active: {},
+    };
+    STUDY2_CATEGORIES.forEach((cat, i) => {
+      p1Ratings.young[cat] = (i % 7) + 1;
+      p1Ratings.active[cat] = ((i + 3) % 7) + 1;
+    });
+
+    const p1Data = {
+      pid: "P200",
+      cond: "0,4",
+      dvOrder: ["young", "active"],
+      block1CategoryOrder: STUDY2_CATEGORIES,
+      block2CategoryOrder: STUDY2_CATEGORIES,
+      ratings: p1Ratings,
+      timing: { totalMs: 100000, block1Ms: 50000, block2Ms: 45000 },
+      completed: true,
+      age: "22",
+      gender: "Man",
+    };
+
+    // Participant 2: trendy + stable (cond="1,3")
+    const p2Ratings: Record<string, Record<string, number>> = {
+      trendy: {},
+      stable: {},
+    };
+    STUDY2_CATEGORIES.forEach((cat, i) => {
+      p2Ratings.trendy[cat] = ((i + 1) % 7) + 1;
+      p2Ratings.stable[cat] = ((i + 5) % 7) + 1;
+    });
+
+    const p2Data = {
+      pid: "P201",
+      cond: "1,3",
+      dvOrder: ["trendy", "stable"],
+      block1CategoryOrder: STUDY2_CATEGORIES,
+      block2CategoryOrder: STUDY2_CATEGORIES,
+      ratings: p2Ratings,
+      timing: { totalMs: 110000, block1Ms: 55000, block2Ms: 50000 },
+      completed: true,
+      age: "30",
+      gender: "Woman",
+    };
+
+    // Flatten both rows (replicating decoder.py)
+    const flat1 = flattenStudy2Row(p1Data);
+    const flat2 = flattenStudy2Row(p2Data);
+
+    // Collect rating keys (non-meta columns) from each row
+    const ratingKeys1 = Object.keys(flat1).filter(
+      (k) => !META_COLUMNS.includes(k)
+    );
+    const ratingKeys2 = Object.keys(flat2).filter(
+      (k) => !META_COLUMNS.includes(k)
+    );
+    const union = new Set([...ratingKeys1, ...ratingKeys2]);
+
+    // 4 traits × 14 categories = 56 total rating columns
+    expect(union.size).toBe(56);
+
+    // Each participant has 28 populated columns
+    expect(ratingKeys1).toHaveLength(28);
+    expect(ratingKeys2).toHaveLength(28);
+
+    // P1 has young/active columns but not trendy/stable
+    expect(flat1).toHaveProperty("young_video_games");
+    expect(flat1).toHaveProperty("active_video_games");
+    expect(flat1).not.toHaveProperty("trendy_video_games");
+    expect(flat1).not.toHaveProperty("stable_video_games");
+
+    // P2 has trendy/stable columns but not young/active
+    expect(flat2).toHaveProperty("trendy_video_games");
+    expect(flat2).toHaveProperty("stable_video_games");
+    expect(flat2).not.toHaveProperty("young_video_games");
+    expect(flat2).not.toHaveProperty("active_video_games");
+
+    // No overlap: intersection should be empty
+    const intersection = ratingKeys1.filter((k) => ratingKeys2.includes(k));
+    expect(intersection).toHaveLength(0);
+  });
+});

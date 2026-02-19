@@ -1,6 +1,20 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import CategoryRating from "@/components/CategoryRating";
 
+// RTL's getByText only checks direct text nodes, not textContent across child
+// elements. CategoryRating renders the category name in a <span> child, so we
+// need a custom matcher that checks element.textContent (which includes
+// descendant text). Restrict to <h3> to avoid matching ancestor elements.
+function headingMatching(regex: RegExp) {
+  return (_: string, element: Element | null): boolean => {
+    return (
+      element !== null &&
+      element.tagName === "H3" &&
+      regex.test(element.textContent ?? "")
+    );
+  };
+}
+
 describe("CategoryRating", () => {
   const defaultProps = {
     category: "Humor",
@@ -21,8 +35,10 @@ describe("CategoryRating", () => {
   it("renders the formatted question with category name inserted", () => {
     render(<CategoryRating {...defaultProps} />);
 
+    // The component lowercases the first char: "Humor" → "humor"
+    // and wraps it in a <span>, splitting the text across elements.
     expect(
-      screen.getByText("How much do you associate Humor with memes?")
+      screen.getByText(headingMatching(/How much do you associate humor with memes\?/))
     ).toBeInTheDocument();
   });
 
@@ -87,8 +103,9 @@ describe("CategoryRating", () => {
     expect(screen.getByText("Next")).toBeDisabled();
 
     // The new category name should appear in the question
+    // "Irony" → "irony" (lowercased first char), rendered in a <span>
     expect(
-      screen.getByText("How much do you associate Irony with memes?")
+      screen.getByText(headingMatching(/How much do you associate irony with memes\?/))
     ).toBeInTheDocument();
 
     // Progress should update

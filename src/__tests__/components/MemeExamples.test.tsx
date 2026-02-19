@@ -10,6 +10,7 @@ describe("MemeExamples", () => {
       { src: "/memes/example2.jpg", alt: "Example meme 2" },
       { src: "/memes/example3.jpg", alt: "Example meme 3" },
     ],
+    minViewingSeconds: 0,
     onContinue: vi.fn(),
   };
 

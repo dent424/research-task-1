@@ -1,12 +1,19 @@
 import { getQueryParams, getStudyParams } from "@/lib/params";
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
+// jsdom makes window.location non-configurable so vi.stubGlobal("location")
+// throws "Cannot redefine property: location". Instead, use the standard DOM
+// history API to change the URL, which updates window.location.search.
 
 function setSearch(search: string) {
-  vi.stubGlobal("location", { search, href: "" });
+  const url = new URL(window.location.href);
+  url.search = search;
+  window.history.replaceState({}, "", url.toString());
 }
+
+afterEach(() => {
+  // Reset URL to clean state
+  window.history.replaceState({}, "", "http://localhost:3000/");
+});
 
 describe("getQueryParams", () => {
   it("returns a URLSearchParams instance", () => {
