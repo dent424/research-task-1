@@ -27,9 +27,9 @@ instructions: |
   In this study, you will rate 14 types of companies on two different
   personality traits.
 
-  For each trait, you will rate how characteristic that trait is for each
-  type of company on a scale from 1 (Not at all characteristic) to 7
-  (Very characteristic).
+  For each trait, you will rate the extent to which it would make sense
+  for each type of company to portray itself as having that trait, on a
+  scale from 1 (Not at all) to 7 (Very much).
 
 categories:
   - { label: "A video game company", key: "video_games" }
@@ -50,81 +50,81 @@ categories:
 dependentVariables:
   - id: young
     label: "young"
-    questionTemplate: "To what extent is **\"young\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"young\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: trendy
     label: "trendy"
-    questionTemplate: "To what extent is **\"trendy\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"trendy\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: responsible
     label: "responsible"
-    questionTemplate: "To what extent is **\"responsible\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"responsible\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: stable
     label: "stable"
-    questionTemplate: "To what extent is **\"stable\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"stable\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: active
     label: "active"
-    questionTemplate: "To what extent is **\"active\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"active\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: corporate
     label: "corporate"
-    questionTemplate: "To what extent is **\"corporate\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"corporate\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: innovative
     label: "innovative"
-    questionTemplate: "To what extent is **\"innovative\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"innovative\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: upper_class
     label: "upper class"
-    questionTemplate: "To what extent is **\"upper class\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"upper class\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: sincere
     label: "sincere"
-    questionTemplate: "To what extent is **\"sincere\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"sincere\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
   - id: bold
     label: "bold"
-    questionTemplate: "To what extent is **\"bold\"** characteristic of {category}?"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"bold\"**?"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all characteristic"
-    maxLabel: "Very characteristic"
+    minLabel: "Not at all"
+    maxLabel: "Very much"
 
 design:
   type: between-subjects
   categoryOrder: randomized
   dvBlocking: randomized
-  blockIntroTemplate: "You will now rate each type of company on how **\"{trait}\"** it is."
-  transitionText: "Now you will rate each type of company on how **\"{trait}\"** it is."
+  blockIntroTemplate: "You will now rate the extent to which it would make sense for each type of company to portray itself as **\"{trait}\"**."
+  transitionText: "Now you will rate the extent to which it would make sense for each type of company to portray itself as **\"{trait}\"**."
 
 demographics:
   age:

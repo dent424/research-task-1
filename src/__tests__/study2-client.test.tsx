@@ -82,41 +82,41 @@ const mockConfig: StudyConfig = {
       id: "young",
       label: "young",
       questionTemplate:
-        'To what extent is **"young"** characteristic of {category}?',
+        'To what extent would it make sense for {category} to portray itself as **"young"**?',
       scaleMin: 1,
       scaleMax: 7,
-      minLabel: "Not at all characteristic",
-      maxLabel: "Very characteristic",
+      minLabel: "Not at all",
+      maxLabel: "Very much",
     },
     {
       id: "trendy",
       label: "trendy",
       questionTemplate:
-        'To what extent is **"trendy"** characteristic of {category}?',
+        'To what extent would it make sense for {category} to portray itself as **"trendy"**?',
       scaleMin: 1,
       scaleMax: 7,
-      minLabel: "Not at all characteristic",
-      maxLabel: "Very characteristic",
+      minLabel: "Not at all",
+      maxLabel: "Very much",
     },
     {
       id: "responsible",
       label: "responsible",
       questionTemplate:
-        'To what extent is **"responsible"** characteristic of {category}?',
+        'To what extent would it make sense for {category} to portray itself as **"responsible"**?',
       scaleMin: 1,
       scaleMax: 7,
-      minLabel: "Not at all characteristic",
-      maxLabel: "Very characteristic",
+      minLabel: "Not at all",
+      maxLabel: "Very much",
     },
     {
       id: "upper_class",
       label: "upper class",
       questionTemplate:
-        'To what extent is **"upper class"** characteristic of {category}?',
+        'To what extent would it make sense for {category} to portray itself as **"upper class"**?',
       scaleMin: 1,
       scaleMax: 7,
-      minLabel: "Not at all characteristic",
-      maxLabel: "Very characteristic",
+      minLabel: "Not at all",
+      maxLabel: "Very much",
     },
   ],
   design: {
@@ -124,9 +124,9 @@ const mockConfig: StudyConfig = {
     categoryOrder: "randomized",
     dvBlocking: "randomized",
     blockIntroTemplate:
-      'You will now rate each type of company on how **"{trait}"** it is.',
+      'You will now rate the extent to which it would make sense for each type of company to portray itself as **"{trait}"**.',
     transitionText:
-      'Now you will rate each type of company on how **"{trait}"** it is.',
+      'Now you will rate the extent to which it would make sense for each type of company to portray itself as **"{trait}"**.',
   },
   demographics: {
     age: { label: "What is your age?", placeholder: "Enter your age" },
@@ -403,12 +403,12 @@ describe("StudyClient — Study 2 (between-subjects)", () => {
       await passComprehensionCheck();
       await passInstructions();
 
-      // Template: 'You will now rate each type of company on how **"{trait}"** it is.'
-      // With trait "young" → textContent: '...how "young" it is.'
+      // Template: 'You will now rate the extent to which it would make sense for each type of company to portray itself as **"{trait}"**.'
+      // With trait "young" → textContent: '...portray itself as "young".'
       await waitFor(() => {
         expect(
           screen.getByText(
-            paragraphMatching(/You will now rate.*"young".*it is/)
+            paragraphMatching(/You will now rate.*portray itself as.*"young"/)
           )
         ).toBeInTheDocument();
       });
@@ -429,7 +429,7 @@ describe("StudyClient — Study 2 (between-subjects)", () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            paragraphMatching(/You will now rate.*"upper class".*it is/)
+            paragraphMatching(/You will now rate.*portray itself as.*"upper class"/)
           )
         ).toBeInTheDocument();
       });
@@ -457,7 +457,7 @@ describe("StudyClient — Study 2 (between-subjects)", () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            paragraphMatching(/Now you will rate.*"upper class".*it is/)
+            paragraphMatching(/Now you will rate.*portray itself as.*"upper class"/)
           )
         ).toBeInTheDocument();
       });
