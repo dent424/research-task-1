@@ -36,10 +36,10 @@ categories:
   - { label: "An amusement park", key: "amusement_park" }
   - { label: "A snack foods company", key: "snack_foods" }
   - { label: "A gym", key: "gym" }
-  - { label: "A car company", key: "car" }
+  - { label: "A car maker", key: "car" }
   - { label: "A wedding planning company", key: "wedding_planning" }
   - { label: "A home renovation company", key: "home_renovation" }
-  - { label: "Public transportation", key: "public_transit" }
+  - { label: "A public transportation provider", key: "public_transit" }
   - { label: "An airline", key: "airline" }
   - { label: "An insurance company", key: "insurance" }
   - { label: "A tax preparation company", key: "tax_preparation" }
