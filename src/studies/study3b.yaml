@@ -125,6 +125,7 @@ design:
   type: between-subjects
   categoryOrder: randomized
   dvBlocking: randomized
+  showUnfamiliarOption: true
   blockIntroTemplate: "You will now rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
   transitionText: "Now you will rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
 

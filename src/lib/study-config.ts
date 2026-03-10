@@ -73,6 +73,7 @@ export interface StudyConfig {
     ratingMode?: string;
     blockIntroTemplate?: string;
     transitionText: string;
+    showUnfamiliarOption?: boolean;
   };
   instructions?: string;
   freeResponse?: FreeResponseConfig;

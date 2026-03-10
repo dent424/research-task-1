@@ -91,6 +91,7 @@ design:
   type: within-subjects
   categoryOrder: randomized
   dvBlocking: randomized
+  showUnfamiliarOption: true
   transitionText: "Now you will answer a different question about the same brands."
 
 freeResponse:

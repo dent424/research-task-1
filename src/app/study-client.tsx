@@ -64,7 +64,7 @@ export default function StudyClient({ config }: StudyClientProps) {
 
   // Ratings data
   const [ratings, setRatings] = useState<
-    Record<string, Record<string, number>>
+    Record<string, Record<string, number | null>>
   >({});
 
   // Free-response and demographics data
@@ -85,6 +85,7 @@ export default function StudyClient({ config }: StudyClientProps) {
 
   const completedKey = `${config.study.id}_completed`;
   const ratingMode = config.design.ratingMode ?? "individual";
+  const showUnfamiliar = config.design.showUnfamiliarOption ?? false;
 
   // Scroll to top on phase changes
   useEffect(() => {
@@ -270,7 +271,7 @@ export default function StudyClient({ config }: StudyClientProps) {
   function handleRating(
     blockPhase: "block1" | "block2",
     categoryKey: string,
-    rating: number
+    rating: number | null
   ) {
     const dvId = dvOrder[blockPhase === "block1" ? 0 : 1];
 
@@ -297,7 +298,7 @@ export default function StudyClient({ config }: StudyClientProps) {
   // Batch rating handler (all categories at once)
   function handleBatchRating(
     blockPhase: "block1" | "block2",
-    allRatings: Record<string, number>
+    allRatings: Record<string, number | null>
   ) {
     const dvId = dvOrder[blockPhase === "block1" ? 0 : 1];
     setRatings((prev) => ({
@@ -449,6 +450,7 @@ export default function StudyClient({ config }: StudyClientProps) {
             scaleMax={block1Dv.scaleMax}
             minLabel={block1Dv.minLabel}
             maxLabel={block1Dv.maxLabel}
+            showUnfamiliarOption={showUnfamiliar}
             onSubmit={(allRatings) => handleBatchRating("block1", allRatings)}
           />
         )}
@@ -464,6 +466,7 @@ export default function StudyClient({ config }: StudyClientProps) {
             maxLabel={block1Dv.maxLabel}
             currentIndex={currentCategoryIndex}
             totalCount={block1Cats.length}
+            showUnfamiliarOption={showUnfamiliar}
             onSubmit={(rating) =>
               handleRating("block1", block1Cat.key, rating)
             }
@@ -486,6 +489,7 @@ export default function StudyClient({ config }: StudyClientProps) {
             scaleMax={block2Dv.scaleMax}
             minLabel={block2Dv.minLabel}
             maxLabel={block2Dv.maxLabel}
+            showUnfamiliarOption={showUnfamiliar}
             onSubmit={(allRatings) => handleBatchRating("block2", allRatings)}
           />
         )}
@@ -501,6 +505,7 @@ export default function StudyClient({ config }: StudyClientProps) {
             maxLabel={block2Dv.maxLabel}
             currentIndex={currentCategoryIndex}
             totalCount={block2Cats.length}
+            showUnfamiliarOption={showUnfamiliar}
             onSubmit={(rating) =>
               handleRating("block2", block2Cat.key, rating)
             }

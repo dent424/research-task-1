@@ -22,7 +22,8 @@ interface CategoryRatingProps {
   maxLabel: string;
   currentIndex: number;
   totalCount: number;
-  onSubmit: (rating: number) => void;
+  showUnfamiliarOption?: boolean;
+  onSubmit: (rating: number | null) => void;
 }
 
 export default function CategoryRating({
@@ -34,12 +35,28 @@ export default function CategoryRating({
   maxLabel,
   currentIndex,
   totalCount,
+  showUnfamiliarOption = false,
   onSubmit,
 }: CategoryRatingProps) {
   const [value, setValue] = useState<number | null>(null);
+  const [unfamiliar, setUnfamiliar] = useState(false);
 
   const displayCategory = category.charAt(0).toLowerCase() + category.slice(1);
   const parts = question.split("{category}");
+
+  function handleUnfamiliarChange() {
+    setUnfamiliar((prev) => {
+      if (!prev) setValue(null);
+      return !prev;
+    });
+  }
+
+  function handleScaleChange(v: number) {
+    setValue(v);
+    setUnfamiliar(false);
+  }
+
+  const canSubmit = value !== null || unfamiliar;
 
   return (
     <div className="flex flex-col items-center gap-8 max-w-2xl">
@@ -59,14 +76,26 @@ export default function CategoryRating({
         minLabel={minLabel}
         maxLabel={maxLabel}
         value={value}
-        onChange={setValue}
+        onChange={handleScaleChange}
       />
+
+      {showUnfamiliarOption && (
+        <label className="flex items-center gap-2 text-sm text-zinc-500 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={unfamiliar}
+            onChange={handleUnfamiliarChange}
+            className="w-4 h-4 accent-zinc-600"
+          />
+          I&apos;m not familiar with this brand
+        </label>
+      )}
 
       <button
         onClick={() => {
-          if (value !== null) onSubmit(value);
+          if (canSubmit) onSubmit(unfamiliar ? null : value!);
         }}
-        disabled={value === null}
+        disabled={!canSubmit}
         className="rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Next
