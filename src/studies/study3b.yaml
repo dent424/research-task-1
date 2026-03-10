@@ -1,0 +1,143 @@
+study:
+  id: study3b
+  title: Study 3b
+
+comprehensionChecks:
+  - id: brand-personality
+    definition: |
+      Just as people have personality traits, brands and product categories
+      can also be seen as having distinct personality traits. For example,
+      a luxury fashion brand might seem "sophisticated" and "elegant,"
+      while a toy company might seem "playful" and "fun."
+    question: "Based on the description above, which of the following best describes brand personality?"
+    options:
+      - text: "A brand's financial performance and market share"
+        correct: false
+      - text: "The personality traits that consumers associate with a brand or product category"
+        correct: true
+      - text: "The personal opinions of a brand's CEO"
+        correct: false
+      - text: "The number of employees at a company"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the description and try again."
+    maxAttempts: 2
+    kickWarning: "That's not quite right. Please re-read the description carefully. If you answer incorrectly again, you will be asked to return the submission."
+
+instructions: |
+  In this study, you will rate 16 brands on two different
+  personality traits.
+
+  For each trait, you will rate the extent to which it would make sense
+  for each brand to portray itself as having that trait, on a
+  scale from 1 (Not at all) to 7 (Very much).
+
+categories:
+  - Doritos
+  - Cheetos
+  - Oreo
+  - Kind
+  - Planet Fitness
+  - Gold's Gym
+  - LA Fitness
+  - Equinox
+  - Spirit
+  - Southwest
+  - JetBlue
+  - Delta
+  - Geico
+  - Progressive
+  - State Farm
+  - Allstate
+
+dependentVariables:
+  - id: young
+    label: "young"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"young\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: trendy
+    label: "trendy"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"trendy\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: responsible
+    label: "responsible"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"responsible\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: stable
+    label: "stable"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"stable\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: active
+    label: "active"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"active\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: corporate
+    label: "corporate"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"corporate\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: innovative
+    label: "innovative"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"innovative\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: upper_class
+    label: "upper class"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"upper class\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: sincere
+    label: "sincere"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"sincere\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+  - id: bold
+    label: "bold"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as **\"bold\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Very much"
+
+design:
+  type: between-subjects
+  categoryOrder: randomized
+  dvBlocking: randomized
+  blockIntroTemplate: "You will now rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
+  transitionText: "Now you will rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+qualtricsReturnUrl: "PLACEHOLDER_UPDATE_WITH_STUDY_3B_QUALTRICS_URL"
