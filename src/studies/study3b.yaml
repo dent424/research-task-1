@@ -31,6 +31,8 @@ instructions: |
   for each brand to portray itself as having that trait, on a
   scale from 1 (Not at all) to 7 (Very much).
 
+  If you are not familiar with a brand, click "I'm not familiar with this brand" instead of selecting a rating.
+
 categories:
   - Doritos
   - Cheetos

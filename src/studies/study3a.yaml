@@ -55,6 +55,10 @@ memeExamples:
     - src: /images/study1/Ruffles.png
       alt: "Ruffles snack brand meme ad using classic painting format"
 
+instructions: |
+  You will be asked to rate 16 brands on two different questions.
+  If you are not familiar with a brand, click "I'm not familiar with this brand" instead of selecting a rating.
+
 categories:
   - Doritos
   - Cheetos
