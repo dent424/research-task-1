@@ -41,7 +41,6 @@ export default function CategoryRating({
   const [value, setValue] = useState<number | null>(null);
   const [unfamiliar, setUnfamiliar] = useState(false);
 
-  const displayCategory = category.charAt(0).toLowerCase() + category.slice(1);
   const parts = question.split("{category}");
 
   function handleUnfamiliarChange() {
@@ -66,7 +65,7 @@ export default function CategoryRating({
 
       <h3 className="text-lg font-medium text-center">
         {renderBoldText(parts[0])}
-        <span className="font-bold underline">{displayCategory}</span>
+        <span className="font-bold underline">{category}</span>
         {renderBoldText(parts[1])}
       </h3>
 
