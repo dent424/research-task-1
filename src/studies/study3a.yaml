@@ -98,14 +98,6 @@ design:
   showUnfamiliarOption: true
   transitionText: "Now you will answer a different question about the same brands."
 
-freeResponse:
-  question: "Did using meme ads feel more cringey for some brands than others? If so, why? If not, why not?"
-  aiWarning: "Please write your response in your own words. Do not use AI services such as ChatGPT, Claude, or similar tools to generate your answer."
-  minChars: 15
-  maxChars: 500
-  minSeconds: 60
-  placeholder: "Type your response here..."
-
 demographics:
   age:
     label: "What is your age?"
