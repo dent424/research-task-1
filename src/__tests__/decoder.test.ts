@@ -494,4 +494,173 @@ describe("Study 2 decoder.py compatibility", () => {
     const intersection = ratingKeys1.filter((k) => ratingKeys2.includes(k));
     expect(intersection).toHaveLength(0);
   });
+
+  /** Replicate Study 2 decoder.py decode_rows_long logic in JS. */
+  function flattenStudy2Long(
+    data: Record<string, unknown>,
+    participantId: number
+  ): Record<string, unknown>[] {
+    const pid = (data.pid as string) ?? "";
+    const cond = (data.cond as string) ?? "";
+    const age = (data.age as string) ?? "";
+    const gender = (data.gender as string) ?? "";
+    const completed = (data.completed as boolean) ?? false;
+
+    const timing = (data.timing as Record<string, number>) ?? {};
+    const dvOrder = (data.dvOrder as string[]) ?? [];
+    const block1Categories = (data.block1CategoryOrder as string[]) ?? [];
+    const block2Categories = (data.block2CategoryOrder as string[]) ?? [];
+    const ratings =
+      (data.ratings as Record<string, Record<string, number>>) ?? {};
+
+    const rows: Record<string, unknown>[] = [];
+    for (const [traitId, categoryRatings] of Object.entries(ratings)) {
+      const block = traitId === dvOrder[0] ? 1 : 2;
+      const catOrder = block === 1 ? block1Categories : block2Categories;
+
+      for (const [categoryKey, value] of Object.entries(categoryRatings)) {
+        const position = catOrder.indexOf(categoryKey);
+        rows.push({
+          id: participantId,
+          pid,
+          cond,
+          trait: traitId,
+          category: categoryKey,
+          rating: value,
+          block,
+          category_position: position === -1 ? "" : position,
+          age,
+          gender,
+          completed,
+          timing_total_ms: timing.totalMs ?? "",
+          timing_block1_ms: timing.block1Ms ?? "",
+          timing_block2_ms: timing.block2Ms ?? "",
+        });
+      }
+    }
+    return rows;
+  }
+
+  const LONG_COLUMNS = [
+    "id",
+    "pid",
+    "cond",
+    "trait",
+    "category",
+    "rating",
+    "block",
+    "category_position",
+    "age",
+    "gender",
+    "completed",
+    "timing_total_ms",
+    "timing_block1_ms",
+    "timing_block2_ms",
+  ];
+
+  it("long format: one row per rating with sequential participant id", () => {
+    const youngRatings: Record<string, number> = {};
+    const activeRatings: Record<string, number> = {};
+    STUDY2_CATEGORIES.forEach((cat, i) => {
+      youngRatings[cat] = (i % 7) + 1;
+      activeRatings[cat] = ((i + 3) % 7) + 1;
+    });
+
+    const studyData = {
+      pid: "P300",
+      cond: "0,4",
+      dvOrder: ["young", "active"],
+      block1CategoryOrder: STUDY2_CATEGORIES,
+      block2CategoryOrder: [...STUDY2_CATEGORIES].reverse(),
+      ratings: { young: youngRatings, active: activeRatings },
+      timing: { totalMs: 180000, block1Ms: 90000, block2Ms: 85000 },
+      completed: true,
+      age: "25",
+      gender: "Man",
+    };
+
+    const longRows = flattenStudy2Long(studyData, 1);
+
+    // 2 traits × 14 categories = 28 rows
+    expect(longRows).toHaveLength(28);
+
+    // Every row has the correct columns
+    for (const row of longRows) {
+      for (const col of LONG_COLUMNS) {
+        expect(row).toHaveProperty(col);
+      }
+    }
+
+    // Every row has id = 1
+    expect(longRows.every((r) => r.id === 1)).toBe(true);
+
+    // Every row has the participant metadata
+    expect(longRows.every((r) => r.pid === "P300")).toBe(true);
+    expect(longRows.every((r) => r.age === "25")).toBe(true);
+    expect(longRows.every((r) => r.gender === "Man")).toBe(true);
+
+    // Block assignment: young = block 1, active = block 2
+    const youngRows = longRows.filter((r) => r.trait === "young");
+    const activeRows = longRows.filter((r) => r.trait === "active");
+    expect(youngRows).toHaveLength(14);
+    expect(activeRows).toHaveLength(14);
+    expect(youngRows.every((r) => r.block === 1)).toBe(true);
+    expect(activeRows.every((r) => r.block === 2)).toBe(true);
+
+    // Category positions match the order arrays
+    const youngVideoGames = youngRows.find((r) => r.category === "video_games");
+    expect(youngVideoGames!.category_position).toBe(
+      STUDY2_CATEGORIES.indexOf("video_games")
+    );
+    expect(youngVideoGames!.rating).toBe(youngRatings.video_games);
+
+    // Active uses reversed category order for block 2
+    const reversedCategories = [...STUDY2_CATEGORIES].reverse();
+    const activeFuneral = activeRows.find(
+      (r) => r.category === "funeral_services"
+    );
+    expect(activeFuneral!.category_position).toBe(
+      reversedCategories.indexOf("funeral_services")
+    );
+  });
+
+  it("long format: two participants get different sequential ids", () => {
+    const makeData = (pid: string, trait1: string, trait2: string) => {
+      const r1: Record<string, number> = {};
+      const r2: Record<string, number> = {};
+      STUDY2_CATEGORIES.forEach((cat, i) => {
+        r1[cat] = (i % 7) + 1;
+        r2[cat] = ((i + 2) % 7) + 1;
+      });
+      return {
+        pid,
+        cond: "0,1",
+        dvOrder: [trait1, trait2],
+        block1CategoryOrder: STUDY2_CATEGORIES,
+        block2CategoryOrder: STUDY2_CATEGORIES,
+        ratings: { [trait1]: r1, [trait2]: r2 },
+        timing: { totalMs: 100000, block1Ms: 50000, block2Ms: 45000 },
+        completed: true,
+        age: "20",
+        gender: "Woman",
+      };
+    };
+
+    const p1Long = flattenStudy2Long(makeData("P400", "young", "trendy"), 1);
+    const p2Long = flattenStudy2Long(makeData("P401", "active", "stable"), 2);
+    const allRows = [...p1Long, ...p2Long];
+
+    // 28 rows per participant
+    expect(p1Long).toHaveLength(28);
+    expect(p2Long).toHaveLength(28);
+    expect(allRows).toHaveLength(56);
+
+    // Sequential ids
+    expect(p1Long.every((r) => r.id === 1)).toBe(true);
+    expect(p2Long.every((r) => r.id === 2)).toBe(true);
+
+    // Different pids preserved
+    expect(p1Long.every((r) => r.pid === "P400")).toBe(true);
+    expect(p2Long.every((r) => r.pid === "P401")).toBe(true);
+  });
 });
