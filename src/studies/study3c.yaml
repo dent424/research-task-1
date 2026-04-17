@@ -1,0 +1,104 @@
+study:
+  id: study3c
+  title: Study 3c
+
+comprehensionChecks:
+  - id: brand-personality
+    definition: |
+      Just as people have personality traits, brands and product categories
+      can also be seen as having distinct personality traits. For example,
+      a luxury fashion brand might seem "sophisticated" and "elegant,"
+      while a toy company might seem "playful" and "fun."
+    question: "Based on the description above, which of the following best describes brand personality?"
+    options:
+      - text: "A brand's financial performance and market share"
+        correct: false
+      - text: "The personality traits that consumers associate with a brand or product category"
+        correct: true
+      - text: "The personal opinions of a brand's CEO"
+        correct: false
+      - text: "The number of employees at a company"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the description and try again."
+    maxAttempts: 2
+    kickWarning: "That's not quite right. Please re-read the description carefully. If you answer incorrectly again, you will be asked to return the submission."
+
+instructions: |
+  In this study, you will rate 16 brands on two different
+  personality traits.
+
+  For each trait, you will rate the extent to which it would make sense
+  for each brand to portray itself as having that trait, on a
+  scale from 1 (Not at all) to 7 (Very much).
+
+  If you are not familiar with a brand, click "I'm not familiar with this brand" instead of selecting a rating.
+
+categories:
+  - Doritos
+  - Cheetos
+  - OREO
+  - KIND Snacks
+  - Planet Fitness
+  - Gold's Gym
+  - LA Fitness
+  - Equinox
+  - Spirit Airlines
+  - Southwest Airlines
+  - JetBlue
+  - Delta Airlines
+  - GEICO
+  - Progressive Insurance
+  - State Farm
+  - Allstate
+
+dependentVariables:
+  - id: fun_serious
+    label: "Fun vs Serious"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Fun\"** or more **\"Serious\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Fun"
+    maxLabel: "Serious"
+  - id: establishment_rebellion
+    label: "Establishment vs Rebellion"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Establishment\"** or more **\"Rebellion\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Establishment"
+    maxLabel: "Rebellion"
+  - id: earnest_insincere
+    label: "Earnest vs Insincere"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Earnest\"** or more **\"Insincere\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Earnest"
+    maxLabel: "Insincere"
+  - id: upstanding_disreputable
+    label: "Upstanding vs Disreputable"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Upstanding\"** or more **\"Disreputable\"**?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Upstanding"
+    maxLabel: "Disreputable"
+
+design:
+  type: between-subjects
+  categoryOrder: randomized
+  dvBlocking: randomized
+  showUnfamiliarOption: true
+  blockIntroTemplate: "You will now rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
+  transitionText: "Now you will rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_TBD_3c"
