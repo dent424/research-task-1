@@ -15,7 +15,7 @@ comprehensionChecks:
     options:
       - text: "A brand's financial performance and market share"
         correct: false
-      - text: "How a brand or product category is positioned between opposing personality traits"
+      - text: "The personality a brand or product category conveys, often described in terms of opposing traits"
         correct: true
       - text: "The personal opinions of a brand's CEO"
         correct: false
