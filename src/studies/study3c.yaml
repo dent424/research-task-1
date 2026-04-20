@@ -62,13 +62,13 @@ dependentVariables:
     scaleMax: 7
     minLabel: "Fun"
     maxLabel: "Serious"
-  - id: establishment_rebellion
-    label: "Establishment vs Rebellion"
-    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Establishment\"** or more **\"Rebellion\"**?"
+  - id: establishment_rebellious
+    label: "Establishment vs Rebellious"
+    questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Establishment\"** or more **\"Rebellious\"**?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Establishment"
-    maxLabel: "Rebellion"
+    maxLabel: "Rebellious"
   - id: earnest_insincere
     label: "Earnest vs Insincere"
     questionTemplate: "To what extent would it make sense for {category} to portray itself as more **\"Earnest\"** or more **\"Insincere\"**?"
