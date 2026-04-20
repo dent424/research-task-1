@@ -6,14 +6,16 @@ comprehensionChecks:
   - id: brand-personality
     definition: |
       Just as people have personality traits, brands and product categories
-      can also be seen as having distinct personality traits. For example,
-      a luxury fashion brand might seem "sophisticated" and "elegant,"
-      while a toy company might seem "playful" and "fun."
+      can also be described in terms of personality. These personalities
+      are often captured by pairs of opposing traits — for example, a
+      luxury fashion brand might come across as more "sophisticated" than
+      "casual," while a toy company might come across as more "playful"
+      than "serious."
     question: "Based on the description above, which of the following best describes brand personality?"
     options:
       - text: "A brand's financial performance and market share"
         correct: false
-      - text: "The personality traits that consumers associate with a brand or product category"
+      - text: "How a brand or product category is positioned between opposing personality traits"
         correct: true
       - text: "The personal opinions of a brand's CEO"
         correct: false
@@ -24,12 +26,13 @@ comprehensionChecks:
     kickWarning: "That's not quite right. Please re-read the description carefully. If you answer incorrectly again, you will be asked to return the submission."
 
 instructions: |
-  In this study, you will rate 16 brands on two different
-  personality traits.
+  In this study, you will rate 16 brands on two pairs of
+  opposing personality traits.
 
-  For each trait, you will rate the extent to which it would make sense
-  for each brand to portray itself as having that trait, on a
-  scale from 1 (Not at all) to 7 (Very much).
+  For each trait pair, you will rate where it would make sense
+  for each brand to fall on a 7-point scale between the two
+  opposing traits (for example, from "Fun" on one end to
+  "Serious" on the other).
 
   If you are not familiar with a brand, click "I'm not familiar with this brand" instead of selecting a rating.
 
@@ -86,8 +89,8 @@ design:
   categoryOrder: randomized
   dvBlocking: randomized
   showUnfamiliarOption: true
-  blockIntroTemplate: "You will now rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
-  transitionText: "Now you will rate the extent to which it would make sense for each brand to portray itself as **\"{trait}\"**."
+  blockIntroTemplate: "You will now rate where each brand falls on the **{trait}** dimension."
+  transitionText: "Now you will rate where each brand falls on the **{trait}** dimension."
 
 demographics:
   age:
