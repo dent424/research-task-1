@@ -21,9 +21,11 @@ export default function TransitionScreen({
 }: TransitionScreenProps) {
   return (
     <div className="flex flex-col items-center gap-8 max-w-2xl">
-      <p className="text-lg text-center text-zinc-700 leading-relaxed">
-        {renderBoldText(text)}
-      </p>
+      {text.split("\n\n").map((paragraph, i) => (
+        <p key={i} className="text-lg text-center text-zinc-700 leading-relaxed">
+          {renderBoldText(paragraph.trim())}
+        </p>
+      ))}
 
       <button
         onClick={onContinue}
