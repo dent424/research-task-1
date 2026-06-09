@@ -10,7 +10,7 @@ interface StimulusRatingProps {
   /** The assigned post text shown on the card. */
   postText: string;
   condition: StimulusCondition;
-  /** DV question. Supports **bold**/***bold italic*** markup. {category} optional. */
+  // DV question. Supports bold / bold-italic markup. A {category} token is optional.
   question: string;
   scaleMin: number;
   scaleMax: number;
