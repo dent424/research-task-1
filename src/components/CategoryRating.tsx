@@ -2,19 +2,7 @@
 
 import { useState } from "react";
 import LikertScale from "./LikertScale";
-
-function renderFormattedText(text: string): React.ReactNode[] {
-  const parts = text.split(/(\*\*\*.*?\*\*\*|\*\*.*?\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("***") && part.endsWith("***")) {
-      return <strong key={i}><em>{part.slice(3, -3)}</em></strong>;
-    }
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i}>{part.slice(2, -2)}</strong>;
-    }
-    return part;
-  });
-}
+import { renderFormattedText } from "@/lib/format";
 
 interface CategoryRatingProps {
   category: string;

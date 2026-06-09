@@ -121,7 +121,7 @@ export default function StudyClient({ config }: StudyClientProps) {
     setDvOrder(shuffledDvs);
 
     // Normalize and randomize category order independently for each block
-    const cats = normalizeCategories(config.categories);
+    const cats = normalizeCategories(config.categories ?? []);
     setBlock1Categories(shuffle(cats));
     setBlock2Categories(shuffle(cats));
 
@@ -475,7 +475,7 @@ export default function StudyClient({ config }: StudyClientProps) {
 
         {phase === "transition" && (
           <TransitionScreen
-            text={substituteTraitLabel(config.design.transitionText, "block2")}
+            text={substituteTraitLabel(config.design.transitionText ?? "", "block2")}
             onContinue={handleTransitionContinue}
           />
         )}

@@ -1,0 +1,183 @@
+# Study 5 — Brand Cringe: person vs. company (2-cell between-subjects)
+#
+# An anonymous PERSON vs. an anonymous COMPANY posts the SAME tweet. Prediction:
+# the identical post cringes more from the company (persuasion knowledge + higher
+# expectations). The `cond` URL param assigns the cell (0 = person, 1 = company);
+# an invalid/absent cond falls back to a random cell (never silently person).
+#
+# STIMULUS CONTROL: the two cards differ ONLY by name + handle. Avatars are
+# omitted so both render the identical neutral placeholder (matched by
+# construction). Handles share the same word_word structure with no
+# company-signalling tokens (no _co / official / inc). The person name is
+# gender-ambiguous. Do not add an asymmetric bio/badge to either cell.
+
+study:
+  id: study5
+  title: Study 5
+
+comprehensionChecks:
+  - id: cringe
+    definition: |
+      "Cringe" is the secondhand embarrassment you feel when someone earnestly
+      tries to be cool, relatable, or "in on the joke" and misses — especially
+      in a situation where they really should have known better. It is not about
+      a simple mistake; it is the feeling that the person or group was sincerely
+      trying and fell flat.
+    question: "Based on the definition above, which of the following best describes 'cringe'?"
+    options:
+      - text: "Embarrassment you feel when someone earnestly tries to come across a certain way and misses"
+        correct: true
+      - text: "A feeling of physical pain"
+        correct: false
+      - text: "Excitement when something surprising happens"
+        correct: false
+      - text: "Anger at someone who insulted you on purpose"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the definition and try again."
+
+instructions: |
+  On the next screens you will see a single social media post. Please read it
+  carefully. You will then answer a series of questions about the post. There
+  are no right or wrong answers — we are interested in your honest reactions.
+
+# Each participant is assigned ONE post (the `post` URL param indexes this list;
+# absent/invalid falls back to a random post). Fully between-subjects:
+# 2 actors x 5 posts = 10 cells. The assigned post id is recorded in the payload.
+stimuli:
+  - id: iconic
+    text: "not us being kind of iconic today 💅"
+  - id: blessed
+    text: "feeling so blessed today honestly 🥹"
+  - id: reminder
+    text: "reminder: you're exactly where you're meant to be 🌱"
+  - id: monday
+    text: "POV: it's monday and you're already done 😭"
+  - id: trust
+    text: "trust the process. it's all coming together 🙏"
+
+# cond = index into this list. 0 = person, 1 = company.
+conditions:
+  - key: person
+    label: Jordan Rivers
+    handle: "@jordan_rivers"
+    actorNoun: person
+  - key: company
+    label: Northwind Daily
+    handle: "@northwind_daily"
+    actorNoun: company
+
+design:
+  type: single-stimulus
+  # cringe (dependentVariables[0]) shows first; the rest are randomized, one per page.
+  dvOrderStrategy: first-pinned-rest-randomized
+
+# All 7-point scales. {actor} is replaced by the cell's actorNoun (person/company)
+# so process items are parallel-worded and differ only by the actor noun.
+dependentVariables:
+  # --- Primary DV (pinned first) ---
+  - id: cringe
+    label: cringe
+    questionTemplate: 'How much does this post make you **cringe**?'
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Extremely"
+
+  # --- Reactions ---
+  - id: authentic
+    label: authentic
+    questionTemplate: "How authentic does this post feel?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all authentic"
+    maxLabel: "Extremely authentic"
+  - id: liking
+    label: liking
+    questionTemplate: "How much do you like this post?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Dislike a great deal"
+    maxLabel: "Like a great deal"
+  - id: sincere
+    label: sincere
+    questionTemplate: "How sincere does this post feel?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all sincere"
+    maxLabel: "Extremely sincere"
+
+  # --- Persuasion-knowledge scale (mechanism 1) ---
+  - id: pk_sell
+    label: persuasion-knowledge (selling)
+    questionTemplate: "Whoever posted this is trying to sell or persuade me."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+  - id: pk_motive
+    label: persuasion-knowledge (motive)
+    questionTemplate: "Whoever posted this has an ulterior motive."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+  - id: pk_ad
+    label: persuasion-knowledge (ad)
+    questionTemplate: "This post is basically marketing or an advertisement."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+
+  # --- Expectancy-violation scale (mechanism 2: higher expectations) ---
+  - id: expect_more
+    label: expectancy (more)
+    questionTemplate: "I would expect more from a {actor} than a post like this."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+  - id: expect_below
+    label: expectancy (below)
+    questionTemplate: "This post falls below what I would expect from a {actor}."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+
+  # --- Earnestness / effort appraisal (the "earnest fail" construct) ---
+  - id: earnest_genuine
+    label: earnestness (genuine)
+    questionTemplate: "Whoever posted this is genuinely, earnestly trying."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+  - id: earnest_toohard
+    label: earnestness (trying too hard)
+    questionTemplate: "Whoever posted this is trying too hard."
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
+
+# Shown AFTER the full DV battery so it does not prime the DVs.
+manipulationCheck:
+  question: "Thinking back to the post you just rated, who posted it?"
+  options:
+    - "An individual person"
+    - "A company or brand"
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+qualtricsReturnUrl: "REPLACE_WITH_STUDY5_QUALTRICS_URL"
