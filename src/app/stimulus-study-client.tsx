@@ -269,6 +269,9 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   const currentCheck = config.comprehensionChecks[comprehensionIndex];
   const condition = assignment ? conditions[assignment.condIndex] : undefined;
   const postText = assignment ? stimuli[assignment.postIndex]?.text : undefined;
+  const actorNoun = condition?.actorNoun ?? "account";
+  const resolveActor = (t: string) => t.replace(/\{actor\}/g, actorNoun);
+  const scenario = config.scenarioTemplate ? resolveActor(config.scenarioTemplate) : "";
   const dvOrder = assignment?.dvOrder ?? [];
   const currentDvId = dvOrder[currentDvIndex];
   const currentDv = config.dependentVariables.find((dv) => dv.id === currentDvId);
@@ -335,12 +338,9 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
         {phase === "rating" && postText !== undefined && condition && currentDv && (
           <StimulusRating
             key={currentDvId}
+            scenario={scenario}
             postText={postText}
-            condition={condition}
-            question={currentDv.questionTemplate.replace(
-              /\{actor\}/g,
-              condition.actorNoun ?? "account"
-            )}
+            question={resolveActor(currentDv.questionTemplate)}
             scaleMin={currentDv.scaleMin}
             scaleMax={currentDv.scaleMax}
             minLabel={currentDv.minLabel}

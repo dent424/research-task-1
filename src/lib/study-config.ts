@@ -66,13 +66,14 @@ export interface Category {
  */
 export interface StimulusCondition {
   key: string; // e.g. "person" | "company" — stored as conditionKey
-  label: string; // display name shown on the card
-  handle: string; // e.g. "@jordan_rivers"
-  descriptor?: string; // optional bio line — must be matched/empty across cells
-  avatar?: string; // optional /images/study5/*.png|svg
-  // Noun substituted for {actor} in DV question templates so parallel-worded
-  // items differ only by the actor noun, e.g. "person" vs "company".
-  actorNoun?: string;
+  // Noun substituted for {actor} in the scenario framing and in DV question
+  // templates, so the two cells differ ONLY by the actor noun, e.g.
+  // "person" vs "company".
+  actorNoun: string;
+  label?: string; // optional display name (unused by the scenario presentation)
+  handle?: string; // optional handle (unused by the scenario presentation)
+  descriptor?: string;
+  avatar?: string;
 }
 
 export interface StimulusItem {
@@ -115,6 +116,9 @@ export interface StudyConfig {
   // single-stimulus only: one post is assigned per participant (the `post` URL
   // param indexes this list; absent/invalid falls back to a random post).
   stimuli?: StimulusItem[];
+  // single-stimulus only: scenario framing shown above the post on each rating
+  // page. {actor} is replaced by the cell's actorNoun; wrap it in ** ** to bold.
+  scenarioTemplate?: string;
   conditions?: StimulusCondition[];
   manipulationCheck?: ManipulationCheckConfig;
   instructions?: string;

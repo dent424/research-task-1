@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import LikertScale from "./LikertScale";
-import StimulusCard from "./StimulusCard";
 import { renderFormattedText } from "@/lib/format";
-import type { StimulusCondition } from "@/lib/study-config";
 
 interface StimulusRatingProps {
-  /** The assigned post text shown on the card. */
+  /** Scenario framing shown above the post. Already actor-substituted; may contain **bold**. */
+  scenario: string;
+  /** The assigned post text. */
   postText: string;
-  condition: StimulusCondition;
-  // DV question. Supports bold / bold-italic markup. A {category} token is optional.
+  // DV question. Supports bold / bold-italic markup. A {actor} token is already substituted.
   question: string;
   scaleMin: number;
   scaleMax: number;
@@ -22,13 +21,14 @@ interface StimulusRatingProps {
 }
 
 /**
- * A single rating page for a single-stimulus study: the post card stays pinned
- * above one DV question + Likert scale. Unlike CategoryRating, the question is
- * NOT required to contain a {category} token — when absent it renders whole.
+ * A single rating page for a single-stimulus study. A short scenario frames the
+ * actor (person vs. company), the post text is shown as a quote, and one DV
+ * question + Likert scale follow. No social-media chrome — the only difference
+ * between cells is the actor noun in the scenario.
  */
 export default function StimulusRating({
+  scenario,
   postText,
-  condition,
   question,
   scaleMin,
   scaleMax,
@@ -38,7 +38,7 @@ export default function StimulusRating({
   totalCount,
   onSubmit,
 }: StimulusRatingProps) {
-  // Reset the selection whenever we move to a new DV (keyed by the parent).
+  // Reset selection whenever the parent moves to a new DV (keyed remount).
   const [value, setValue] = useState<number | null>(null);
 
   const canSubmit = value !== null;
@@ -49,13 +49,21 @@ export default function StimulusRating({
         {currentIndex + 1} of {totalCount}
       </p>
 
-      <StimulusCard
-        label={condition.label}
-        handle={condition.handle}
-        descriptor={condition.descriptor}
-        avatar={condition.avatar}
-        text={postText}
-      />
+      {scenario && (
+        <p
+          data-testid="scenario"
+          className="text-base text-center text-zinc-700 leading-relaxed"
+        >
+          {renderFormattedText(scenario)}
+        </p>
+      )}
+
+      <blockquote
+        data-testid="post-text"
+        className="w-full max-w-md border-l-4 border-zinc-300 bg-zinc-50 px-5 py-4 text-left text-[17px] leading-snug text-zinc-900"
+      >
+        {postText}
+      </blockquote>
 
       <h3 className="text-lg font-medium text-center">
         {renderFormattedText(question)}

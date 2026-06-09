@@ -1,19 +1,19 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import StimulusRating from "@/components/StimulusRating";
-import type { StimulusCondition } from "@/lib/study-config";
 
-const POST_TEXT = "pure main-character energy 💅";
-const condition: StimulusCondition = {
-  key: "person",
-  label: "Jordan Rivers",
-  handle: "@jordan_rivers",
-};
+const SCENARIO =
+  "Imagine that you are scrolling through social media and you see a **company** make the following post:";
+const POST_TEXT = "feeling so blessed today honestly 🥹";
 
-function renderRating(question: string, onSubmit = vi.fn()) {
+function renderRating(
+  question: string,
+  onSubmit = vi.fn(),
+  scenario = SCENARIO
+) {
   render(
     <StimulusRating
+      scenario={scenario}
       postText={POST_TEXT}
-      condition={condition}
       question={question}
       scaleMin={1}
       scaleMax={7}
@@ -27,21 +27,26 @@ function renderRating(question: string, onSubmit = vi.fn()) {
 }
 
 describe("StimulusRating", () => {
-  it("renders a question that has NO {category} token without throwing", () => {
-    expect(() =>
-      renderRating("How **cringe** is this post?")
-    ).not.toThrow();
+  it("renders the scenario framing (with the bolded actor) and the post text", () => {
+    renderRating("How **cringe** is this post?");
+    expect(screen.getByTestId("scenario")).toHaveTextContent(
+      /Imagine that you are scrolling through social media and you see a company/
+    );
+    expect(screen.getByTestId("post-text")).toHaveTextContent(
+      "feeling so blessed today honestly"
+    );
+  });
+
+  it("renders the question without throwing (no card chrome, no tokens)", () => {
+    expect(() => renderRating("How **cringe** is this post?")).not.toThrow();
     expect(
       screen.getByRole("heading", { name: /How cringe is this post\?/ })
     ).toBeInTheDocument();
   });
 
-  it("keeps the stimulus card pinned above the question", () => {
-    renderRating("How cringe is this post?");
-    expect(screen.getByTestId("post-text")).toHaveTextContent(
-      "pure main-character energy"
-    );
-    expect(screen.getByTestId("card-name")).toHaveTextContent("Jordan Rivers");
+  it("omits the scenario element when no scenario is given", () => {
+    renderRating("How cringe is this post?", vi.fn(), "");
+    expect(screen.queryByTestId("scenario")).not.toBeInTheDocument();
   });
 
   it("disables Next until a value is selected, then submits the value", () => {

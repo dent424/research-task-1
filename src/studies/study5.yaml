@@ -1,48 +1,32 @@
 # Study 5 — Brand Cringe: person vs. company (2-cell between-subjects)
 #
-# An anonymous PERSON vs. an anonymous COMPANY posts the SAME tweet. Prediction:
+# An anonymous PERSON vs. an anonymous COMPANY posts the SAME text. Prediction:
 # the identical post cringes more from the company (persuasion knowledge + higher
-# expectations). The `cond` URL param assigns the cell (0 = person, 1 = company);
-# an invalid/absent cond falls back to a random cell (never silently person).
+# expectations). The post is presented as a SCENARIO (no social-media chrome);
+# the only difference between cells is the actor noun in the framing.
 #
-# STIMULUS CONTROL: the two cards differ ONLY by name + handle. Avatars are
-# omitted so both render the identical neutral placeholder (matched by
-# construction). Handles share the same word_word structure with no
-# company-signalling tokens (no _co / official / inc). The person name is
-# gender-ambiguous. Do not add an asymmetric bio/badge to either cell.
+# Fully between-subjects: 2 actors x 5 posts = 10 cells.
+#   - actor: `cond` URL param (0 = person, 1 = company); invalid/absent -> random
+#   - post:  `post` URL param indexes `stimuli`; invalid/absent -> random
+# Both are recorded with *FromUrl flags; assignment persists across refresh.
 
 study:
   id: study5
   title: Study 5
 
-comprehensionChecks:
-  - id: cringe
-    definition: |
-      "Cringe" is the secondhand embarrassment you feel when someone earnestly
-      tries to be cool, relatable, or "in on the joke" and misses — especially
-      in a situation where they really should have known better. It is not about
-      a simple mistake; it is the feeling that the person or group was sincerely
-      trying and fell flat.
-    question: "Based on the definition above, which of the following best describes 'cringe'?"
-    options:
-      - text: "Embarrassment you feel when someone earnestly tries to come across a certain way and misses"
-        correct: true
-      - text: "A feeling of physical pain"
-        correct: false
-      - text: "Excitement when something surprising happens"
-        correct: false
-      - text: "Anger at someone who insulted you on purpose"
-        correct: false
-    retryMessage: "That's not quite right. Please re-read the definition and try again."
+# No comprehension check (cringe is not defined for participants).
+comprehensionChecks: []
 
 instructions: |
-  On the next screens you will see a single social media post. Please read it
-  carefully. You will then answer a series of questions about the post. There
-  are no right or wrong answers — we are interested in your honest reactions.
+  On the next screens you will read a short social media post and answer a few
+  questions about it. There are no right or wrong answers — we are interested in
+  your honest reactions.
+
+# Scenario framing shown above the post on every rating page. {actor} -> actorNoun.
+scenarioTemplate: "Imagine that you are scrolling through social media and you see a **{actor}** make the following post:"
 
 # Each participant is assigned ONE post (the `post` URL param indexes this list;
-# absent/invalid falls back to a random post). Fully between-subjects:
-# 2 actors x 5 posts = 10 cells. The assigned post id is recorded in the payload.
+# absent/invalid falls back to a random post). The assigned post id is recorded.
 stimuli:
   - id: iconic
     text: "not us being kind of iconic today 💅"
@@ -58,12 +42,8 @@ stimuli:
 # cond = index into this list. 0 = person, 1 = company.
 conditions:
   - key: person
-    label: Jordan Rivers
-    handle: "@jordan_rivers"
     actorNoun: person
   - key: company
-    label: Northwind Daily
-    handle: "@northwind_daily"
     actorNoun: company
 
 design:
@@ -77,7 +57,7 @@ dependentVariables:
   # --- Primary DV (pinned first) ---
   - id: cringe
     label: cringe
-    questionTemplate: 'How much does this post make you **cringe**?'
+    questionTemplate: 'How **cringe** is this post?'
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all"
@@ -129,17 +109,17 @@ dependentVariables:
     minLabel: "Strongly disagree"
     maxLabel: "Strongly agree"
 
-  # --- Expectancy-violation scale (mechanism 2: higher expectations) ---
-  - id: expect_more
-    label: expectancy (more)
-    questionTemplate: "I would expect more from a {actor} than a post like this."
+  # --- Higher-expectations scale (mechanism 2) ---
+  - id: expect_better
+    label: expectations (better)
+    questionTemplate: "I expect better from this {actor}."
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
     maxLabel: "Strongly agree"
-  - id: expect_below
-    label: expectancy (below)
-    questionTemplate: "This post falls below what I would expect from a {actor}."
+  - id: expect_standard
+    label: expectations (standard)
+    questionTemplate: "I hold a {actor} to a higher standard than this post."
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
