@@ -336,7 +336,7 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
 
         {phase === "instructions" && config.instructions && (
           <TransitionScreen
-            text={config.instructions}
+            text={resolveActor(config.instructions)}
             onContinue={() => setPhase("rating")}
           />
         )}
@@ -347,6 +347,7 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             scenario={scenario}
             postText={postText}
             question={resolveActor(currentDv.questionTemplate)}
+            preamble={currentDv.preamble}
             scaleMin={currentDv.scaleMin}
             scaleMax={currentDv.scaleMax}
             minLabel={currentDv.minLabel}

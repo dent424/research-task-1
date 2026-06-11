@@ -44,6 +44,34 @@ describe("StimulusRating", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders a left-justified preamble above the question when provided", () => {
+    render(
+      <StimulusRating
+        scenario={SCENARIO}
+        postText={POST_TEXT}
+        question="Whoever posted this has an ulterior motive for posting it."
+        preamble="How much do you disagree or agree with the following statement"
+        scaleMin={1}
+        scaleMax={7}
+        minLabel="Strongly disagree"
+        maxLabel="Strongly agree"
+        currentIndex={0}
+        totalCount={5}
+        onSubmit={vi.fn()}
+      />
+    );
+    const preamble = screen.getByTestId("preamble");
+    expect(preamble).toHaveTextContent(
+      "How much do you disagree or agree with the following statement"
+    );
+    expect(preamble.className).toMatch(/text-left/);
+  });
+
+  it("omits the preamble element when none is given", () => {
+    renderRating("How cringe is this post?");
+    expect(screen.queryByTestId("preamble")).not.toBeInTheDocument();
+  });
+
   it("omits the scenario element when no scenario is given", () => {
     renderRating("How cringe is this post?", vi.fn(), "");
     expect(screen.queryByTestId("scenario")).not.toBeInTheDocument();

@@ -18,10 +18,12 @@ study:
 # No comprehension check (cringe is not defined for participants).
 comprehensionChecks: []
 
+# {actorPhrase} resolves per cell, so the scenario framing appears here on the
+# intro page AND (in gray) above the post on every rating page.
 instructions: |
-  On the next screens you will read a short social media post and answer a few
-  questions about it. There are no right or wrong answers — we are interested in
-  your honest reactions.
+  Imagine you are scrolling through social media and you see a post from **{actorPhrase}**.
+
+  On the next screens you will see the post and answer a few questions about it. There are no right or wrong answers — we are interested in your honest reactions.
 
 # Scenario framing shown above the post on every rating page.
 # {actorPhrase} -> the cell's actorPhrase (article included).
@@ -64,7 +66,7 @@ dependentVariables:
   # --- Primary DV (pinned first) ---
   - id: cringe
     label: cringe
-    questionTemplate: 'How **cringe** is this post?'
+    questionTemplate: 'How cringe is this post?'
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all"
@@ -109,6 +111,7 @@ dependentVariables:
   - id: pk_persuade
     label: persuasion-knowledge (persuade)
     questionTemplate: "It is pretty obvious that whoever posted this is trying to persuade me."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -116,6 +119,7 @@ dependentVariables:
   - id: pk_motive
     label: persuasion-knowledge (motive)
     questionTemplate: "Whoever posted this has an ulterior motive for posting it."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -123,6 +127,7 @@ dependentVariables:
   - id: pk_ad
     label: persuasion-knowledge (ad)
     questionTemplate: "This post is basically marketing or an advertisement."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -132,6 +137,7 @@ dependentVariables:
   - id: expect_better
     label: expectations (better)
     questionTemplate: "I expect better from this {actor}."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -139,6 +145,7 @@ dependentVariables:
   - id: expect_standard
     label: expectations (standard)
     questionTemplate: "I hold {actors} to a higher standard than this post."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -148,6 +155,7 @@ dependentVariables:
   - id: earnest_genuine
     label: earnestness (genuine)
     questionTemplate: "Whoever posted this is genuinely, earnestly trying."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -155,6 +163,7 @@ dependentVariables:
   - id: earnest_toohard
     label: earnestness (trying too hard)
     questionTemplate: "Whoever posted this is trying too hard."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"

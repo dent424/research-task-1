@@ -32,6 +32,10 @@ export interface DependentVariable {
   id: string;
   label?: string;
   questionTemplate: string;
+  // Optional small lead-in shown left-justified above the question, e.g.
+  // "How much do you disagree or agree with the following statement" for
+  // agree/disagree statement items.
+  preamble?: string;
   scaleMin: number;
   scaleMax: number;
   minLabel: string;

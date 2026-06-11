@@ -11,6 +11,8 @@ interface StimulusRatingProps {
   postText: string;
   // DV question. Supports bold / bold-italic markup. A {actor} token is already substituted.
   question: string;
+  /** Optional small lead-in shown left-justified above the question. */
+  preamble?: string;
   scaleMin: number;
   scaleMax: number;
   minLabel: string;
@@ -30,6 +32,7 @@ export default function StimulusRating({
   scenario,
   postText,
   question,
+  preamble,
   scaleMin,
   scaleMax,
   minLabel,
@@ -52,7 +55,7 @@ export default function StimulusRating({
       {scenario && (
         <p
           data-testid="scenario"
-          className="text-base text-center text-zinc-700 leading-relaxed"
+          className="text-base text-center text-zinc-400 leading-relaxed"
         >
           {renderFormattedText(scenario)}
         </p>
@@ -65,9 +68,19 @@ export default function StimulusRating({
         {postText}
       </blockquote>
 
-      <h3 className="text-lg font-medium text-center">
-        {renderFormattedText(question)}
-      </h3>
+      <div className="w-full flex flex-col gap-2">
+        {preamble && (
+          <p
+            data-testid="preamble"
+            className="text-sm text-left text-zinc-500"
+          >
+            {preamble}
+          </p>
+        )}
+        <h3 className="text-lg font-medium text-center">
+          {renderFormattedText(question)}
+        </h3>
+      </div>
 
       <LikertScale
         min={scaleMin}

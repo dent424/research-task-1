@@ -345,6 +345,60 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
     });
   });
 
+  describe("instructions page", () => {
+    it("resolves {actorPhrase} in the instructions text", async () => {
+      const introConfig: StudyConfig = {
+        ...mockConfig,
+        instructions:
+          "Imagine you are scrolling through social media and you see a post from **{actorPhrase}**.\n\nYou will answer a few questions about it.",
+      };
+      mockCondition = "1";
+      await act(async () => {
+        render(<StimulusStudyClient config={introConfig} />);
+      });
+      await passConsent();
+      // The phrase is bolded, so it renders as its own <strong> element.
+      await waitFor(() =>
+        expect(
+          screen.getByText("a brand you are not familiar with")
+        ).toBeInTheDocument()
+      );
+      expect(screen.queryByText(/\{actorPhrase\}/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("statement preamble", () => {
+    it("passes a DV's preamble through to the rating page", async () => {
+      const preambleConfig: StudyConfig = {
+        ...mockConfig,
+        dependentVariables: [
+          {
+            id: "pk_motive",
+            label: "persuasion-knowledge (motive)",
+            questionTemplate:
+              "Whoever posted this has an ulterior motive for posting it.",
+            preamble:
+              "How much do you disagree or agree with the following statement",
+            scaleMin: 1,
+            scaleMax: 7,
+            minLabel: "Strongly disagree",
+            maxLabel: "Strongly agree",
+          },
+        ],
+      };
+      await act(async () => {
+        render(<StimulusStudyClient config={preambleConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+      await waitFor(() =>
+        expect(screen.getByTestId("preamble")).toHaveTextContent(
+          "How much do you disagree or agree with the following statement"
+        )
+      );
+    });
+  });
+
   describe("DV ordering", () => {
     it("cringe is the first rating page and is pinned at dvOrder[0]", async () => {
       await act(async () => {

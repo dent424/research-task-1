@@ -1,0 +1,195 @@
+study:
+  id: study4
+  title: Study 4
+
+comprehensionChecks:
+  - id: cringe
+    definition: |
+      "Cringe" is a feeling of embarrassment or awkwardness you experience
+      when you see someone do something that feels socially uncomfortable,
+      out of touch, or trying too hard. For example, you might "cringe"
+      when a parent tries to use teenage slang, or when someone makes an
+      awkward joke that doesn't land.
+    question: "Based on the definition above, which of the following best describes 'cringe'?"
+    options:
+      - text: "A feeling of physical pain"
+        correct: false
+      - text: "A feeling of embarrassment from something socially awkward or out of touch"
+        correct: true
+      - text: "A feeling of excitement and surprise"
+        correct: false
+      - text: "A feeling of sadness and grief"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the definition and try again."
+
+  - id: meme
+    definition: |
+      A "meme" is a humorous image, video, or piece of text that is widely
+      shared on the internet. Memes typically use a familiar image or format
+      combined with new text to make a joke or express an idea that many
+      people can relate to. They spread quickly on social media and often
+      reference pop culture or everyday situations.
+    question: "Based on the definition above, which of the following best describes a meme?"
+    options:
+      - text: "A professional photograph used in news articles"
+        correct: false
+      - text: "A widely shared humorous image or text format, often referencing pop culture"
+        correct: true
+      - text: "A type of formal business communication"
+        correct: false
+      - text: "A scientific diagram used for education"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the definition and try again."
+
+memeExamples:
+  minViewingSeconds: 10
+  introduction: |
+    Companies sometimes use memes in their advertising to connect with
+    audiences on social media. Below are three real examples of brands
+    using memes in their ads.
+  images:
+    - src: /images/study1/Bumble.jpeg
+      alt: "Bumble dating app meme ad using Barbie movie format"
+    - src: /images/study1/Drake.png
+      alt: "Resparked gift shop ad using Drake meme format"
+    - src: /images/study1/Ruffles.png
+      alt: "Ruffles snack brand meme ad using classic painting format"
+
+instructions: |
+  You will be asked to rate 25 brands on how "cringe" it would be for
+  each brand to use meme ads.
+
+  If you are not familiar with a brand, click "I'm not familiar with this
+  brand" instead of selecting a rating.
+
+categories:
+  - McDonald's
+  - Walmart
+  - Coca-Cola
+  - Pepsi-Cola
+  - Burger King
+  - Subway
+  - U.S. Postal Service
+  - KFC
+  - FedEx/Federal Express
+  - Colgate
+  - Target
+  - Wendy's
+  - UPS
+  - Nike
+  - Sprite
+  - Pizza Hut
+  - Microsoft
+  - Ford
+  - Crest
+  - Domino's
+  - Home Depot
+  - Dove (personal care)
+  - Best Buy
+  - Samsung
+  - Apple
+  - 7-Up
+  - Taco Bell
+  - Starbucks
+  - Adidas
+  - Toyota
+  - Bounty Paper Towels
+  - Levi's
+  - Chevrolet
+  - Lowe's
+  - SONY
+  - Honda
+  - Walgreens (store brand)
+  - Verizon
+  - Dr Pepper
+  - CVS pharmacy
+  - AT&T
+  - Dunkin'
+  - Applebee's Neighborhood Grill & Bar
+  - Diet Coke
+  - LEGO
+  - Kraft
+  - Papa John's
+  - HP
+  - Mountain Dew
+  - 7-Eleven
+  - Dell
+  - Tylenol
+  - Advil
+  - Olive Garden
+  - IHOP
+  - Old Navy
+  - Chick-fil-A
+  - Nestlé
+  - Diet Pepsi
+  - Dairy Queen
+  - Arby's
+  - Skittles
+  - Macy's
+  - Kohl's
+  - JC Penney
+  - iPhone
+  - Crest Pro Health (mouthwash)
+  - Arm & Hammer
+  - BMW
+  - Oral-B
+  - Nissan
+  - Crayola
+  - Denny's
+  - Toys R Us
+  - Shell (energy)
+  - Dole
+  - Charmin
+  - Capital One
+  - AT&T - Internet
+  - Fanta
+  - Red Lobster
+  - Colgate Total (mouthwash)
+  - Bank of America
+  - Glad (trash bags)
+  - Tootsie Roll
+  - Tic Tac
+  - Chili's Bar & Grill
+  - PetSmart
+  - Costco
+  - Hyundai
+  - Scott (toilet paper)
+  - Eggo
+  - LG
+  - T.J. Maxx
+  - Subaru
+  - Mercedes-Benz
+  - Chipotle
+  - Sonic (restaurant)
+  - Life Savers (candy)
+  - Energizer
+
+dependentVariables:
+  - id: cringe
+    questionTemplate: "How ***\"cringe\"*** would it be for {category} to use meme ads?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all \"cringe\""
+    maxLabel: "Extremely \"cringe\""
+
+design:
+  type: within-subjects
+  categoryOrder: randomized
+  dvBlocking: randomized
+  showUnfamiliarOption: true
+  samplePerParticipant: 25
+  transitionText: ""
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+qualtricsReturnUrl: "REPLACE_WITH_STUDY4_QUALTRICS_URL"
