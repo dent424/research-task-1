@@ -270,7 +270,13 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   const condition = assignment ? conditions[assignment.condIndex] : undefined;
   const postText = assignment ? stimuli[assignment.postIndex]?.text : undefined;
   const actorNoun = condition?.actorNoun ?? "account";
-  const resolveActor = (t: string) => t.replace(/\{actor\}/g, actorNoun);
+  const actorNounPlural = condition?.actorNounPlural ?? "accounts";
+  const actorPhrase = condition?.actorPhrase ?? `a ${actorNoun}`;
+  const resolveActor = (t: string) =>
+    t
+      .replace(/\{actorPhrase\}/g, actorPhrase)
+      .replace(/\{actors\}/g, actorNounPlural)
+      .replace(/\{actor\}/g, actorNoun);
   const scenario = config.scenarioTemplate ? resolveActor(config.scenarioTemplate) : "";
   const dvOrder = assignment?.dvOrder ?? [];
   const currentDvId = dvOrder[currentDvIndex];

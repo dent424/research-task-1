@@ -70,6 +70,14 @@ export interface StimulusCondition {
   // templates, so the two cells differ ONLY by the actor noun, e.g.
   // "person" vs "company".
   actorNoun: string;
+  // Plural form substituted for {actors} in DV question templates (it cannot
+  // be derived from the singular), e.g. "people" vs "companies".
+  actorNounPlural?: string;
+  // Longer descriptive phrase (article included) substituted for {actorPhrase}
+  // in the scenario framing, e.g. "a person you don't know" vs "a brand you
+  // are not familiar with". Falls back to "a/an {actorNoun}" semantics in the
+  // client when absent.
+  actorPhrase?: string;
   label?: string; // optional display name (unused by the scenario presentation)
   handle?: string; // optional handle (unused by the scenario presentation)
   descriptor?: string;

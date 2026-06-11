@@ -61,14 +61,24 @@ const mockConfig: StudyConfig = {
   comprehensionChecks: [],
   instructions: "You will read a short social media post.",
   scenarioTemplate:
-    "Imagine that you are scrolling through social media and you see a **{actor}** make the following post:",
+    "Imagine you are scrolling through social media and you see a post from **{actorPhrase}**:",
   stimuli: [
     { id: "iconic", text: "not us being kind of iconic today 💅" },
     { id: "blessed", text: "feeling so blessed today honestly 🥹" },
   ],
   conditions: [
-    { key: "person", actorNoun: "person" },
-    { key: "company", actorNoun: "company" },
+    {
+      key: "person",
+      actorNoun: "person",
+      actorNounPlural: "people",
+      actorPhrase: "a person you don't know",
+    },
+    {
+      key: "company",
+      actorNoun: "company",
+      actorNounPlural: "companies",
+      actorPhrase: "a brand you are not familiar with",
+    },
   ],
   dependentVariables: [
     {
@@ -221,7 +231,7 @@ afterEach(() => {
 
 describe("StimulusStudyClient — single-stimulus between-subjects", () => {
   describe("condition assignment", () => {
-    it('cond="0" frames the post as coming from a person', async () => {
+    it('cond="0" frames the post as coming from a person you don\'t know', async () => {
       mockCondition = "0";
       await act(async () => {
         render(<StimulusStudyClient config={mockConfig} />);
@@ -230,12 +240,12 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
       await passInstructions();
       await waitFor(() =>
         expect(screen.getByTestId("scenario")).toHaveTextContent(
-          /you see a person make the following post/
+          /you see a post from a person you don't know/
         )
       );
     });
 
-    it('cond="1" frames the post as a company, same post text', async () => {
+    it('cond="1" frames the post as an unfamiliar brand, same post text', async () => {
       mockCondition = "1";
       await act(async () => {
         render(<StimulusStudyClient config={mockConfig} />);
@@ -244,7 +254,7 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
       await passInstructions();
       await waitFor(() =>
         expect(screen.getByTestId("scenario")).toHaveTextContent(
-          /you see a company make the following post/
+          /you see a post from a brand you are not familiar with/
         )
       );
       expect(screen.getByTestId("post-text")).toHaveTextContent(
@@ -267,7 +277,7 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
         await passInstructions();
         await waitFor(() =>
           expect(screen.getByTestId("scenario")).toHaveTextContent(
-            /you see a company make the following post/
+            /you see a post from a brand you are not familiar with/
           )
         );
 
@@ -281,6 +291,58 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
         expect(lastRedirectData.condFromUrl).toBe(false);
       }
     );
+  });
+
+  describe("plural actor token", () => {
+    // One DV whose template uses {actors} (plural) — rendered as the first
+    // (and only) rating page so we can assert on it directly.
+    const pluralConfig: StudyConfig = {
+      ...mockConfig,
+      dependentVariables: [
+        {
+          id: "expect_standard",
+          label: "expectations (standard)",
+          questionTemplate:
+            "I hold {actors} to a higher standard than this post.",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Strongly disagree",
+          maxLabel: "Strongly agree",
+        },
+      ],
+    };
+
+    it('cond="0" renders {actors} as "people"', async () => {
+      mockCondition = "0";
+      await act(async () => {
+        render(<StimulusStudyClient config={pluralConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", {
+            name: /I hold people to a higher standard than this post\./,
+          })
+        ).toBeInTheDocument()
+      );
+    });
+
+    it('cond="1" renders {actors} as "companies"', async () => {
+      mockCondition = "1";
+      await act(async () => {
+        render(<StimulusStudyClient config={pluralConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", {
+            name: /I hold companies to a higher standard than this post\./,
+          })
+        ).toBeInTheDocument()
+      );
+    });
   });
 
   describe("DV ordering", () => {

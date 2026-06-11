@@ -3,7 +3,8 @@
 # An anonymous PERSON vs. an anonymous COMPANY posts the SAME text. Prediction:
 # the identical post cringes more from the company (persuasion knowledge + higher
 # expectations). The post is presented as a SCENARIO (no social-media chrome);
-# the only difference between cells is the actor noun in the framing.
+# the only difference between cells is the actor phrase in the framing
+# ("a person you don't know" vs "a brand you are not familiar with").
 #
 # Fully between-subjects: 2 actors x 5 posts = 10 cells.
 #   - actor: `cond` URL param (0 = person, 1 = company); invalid/absent -> random
@@ -22,8 +23,9 @@ instructions: |
   questions about it. There are no right or wrong answers — we are interested in
   your honest reactions.
 
-# Scenario framing shown above the post on every rating page. {actor} -> actorNoun.
-scenarioTemplate: "Imagine that you are scrolling through social media and you see a **{actor}** make the following post:"
+# Scenario framing shown above the post on every rating page.
+# {actorPhrase} -> the cell's actorPhrase (article included).
+scenarioTemplate: "Imagine you are scrolling through social media and you see a post from **{actorPhrase}**:"
 
 # Each participant is assigned ONE post (the `post` URL param indexes this list;
 # absent/invalid falls back to a random post). The assigned post id is recorded.
@@ -43,8 +45,12 @@ stimuli:
 conditions:
   - key: person
     actorNoun: person
+    actorNounPlural: people
+    actorPhrase: "a person you don't know"
   - key: company
     actorNoun: company
+    actorNounPlural: companies
+    actorPhrase: "a brand you are not familiar with"
 
 design:
   type: single-stimulus
@@ -52,7 +58,8 @@ design:
   dvOrderStrategy: first-pinned-rest-randomized
 
 # All 7-point scales. {actor} is replaced by the cell's actorNoun (person/company)
-# so process items are parallel-worded and differ only by the actor noun.
+# and {actors} by its actorNounPlural (people/companies) so process items are
+# parallel-worded and differ only by the actor noun.
 dependentVariables:
   # --- Primary DV (pinned first) ---
   - id: cringe
@@ -78,25 +85,37 @@ dependentVariables:
     scaleMax: 7
     minLabel: "Dislike a great deal"
     maxLabel: "Like a great deal"
+  # Semantic differential about the POSTER (not the post), from Campbell &
+  # Kirmani (2000) 4-item sincerity scale (sincere/insincere, honest/dishonest,
+  # not manipulative/manipulative, not pushy/pushy; alpha = .87, JCR 27(1),
+  # p. 73). We use only the insincere-sincere item. PDF in
+  # Literature/Campbell-Kirmani-ConsumersUseOfPersuasionKnowledge-2000.pdf
   - id: sincere
     label: sincere
-    questionTemplate: "How sincere does this post feel?"
+    questionTemplate: "Whoever posted this seems:"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Not at all sincere"
-    maxLabel: "Extremely sincere"
+    minLabel: "Insincere"
+    maxLabel: "Sincere"
 
   # --- Persuasion-knowledge scale (mechanism 1) ---
-  - id: pk_sell
-    label: persuasion-knowledge (selling)
-    questionTemplate: "Whoever posted this is trying to sell or persuade me."
+  # pk_persuade and pk_motive adapted from Campbell & Kirmani (2000),
+  # "Consumers' Use of Persuasion Knowledge", JCR 27(1), 69-83. PDF in
+  # Literature/Campbell-Kirmani-ConsumersUseOfPersuasionKnowledge-2000.pdf
+  # Originals: "While I read the story, I thought it was pretty obvious that
+  # Pat was trying to persuade the customer" (p. 75) and "Pat had an ulterior
+  # motive for saying the jacket looked good" (p. 77); both 7-pt
+  # strongly disagree - strongly agree.
+  - id: pk_persuade
+    label: persuasion-knowledge (persuade)
+    questionTemplate: "It is pretty obvious that whoever posted this is trying to persuade me."
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
     maxLabel: "Strongly agree"
   - id: pk_motive
     label: persuasion-knowledge (motive)
-    questionTemplate: "Whoever posted this has an ulterior motive."
+    questionTemplate: "Whoever posted this has an ulterior motive for posting it."
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
@@ -119,7 +138,7 @@ dependentVariables:
     maxLabel: "Strongly agree"
   - id: expect_standard
     label: expectations (standard)
-    questionTemplate: "I hold a {actor} to a higher standard than this post."
+    questionTemplate: "I hold {actors} to a higher standard than this post."
     scaleMin: 1
     scaleMax: 7
     minLabel: "Strongly disagree"
