@@ -87,18 +87,20 @@ dependentVariables:
     scaleMax: 7
     minLabel: "Dislike a great deal"
     maxLabel: "Like a great deal"
-  # Semantic differential about the POSTER (not the post), from Campbell &
-  # Kirmani (2000) 4-item sincerity scale (sincere/insincere, honest/dishonest,
-  # not manipulative/manipulative, not pushy/pushy; alpha = .87, JCR 27(1),
-  # p. 73). We use only the insincere-sincere item. PDF in
+  # About the POSTER (not the post). Adapted from the insincere-sincere item
+  # of Campbell & Kirmani's (2000) 4-item sincerity scale (sincere/insincere,
+  # honest/dishonest, not manipulative/manipulative, not pushy/pushy;
+  # alpha = .87, JCR 27(1), p. 73), converted from a semantic differential to
+  # an agree/disagree statement to match the rest of the battery. PDF in
   # Literature/Campbell-Kirmani-ConsumersUseOfPersuasionKnowledge-2000.pdf
   - id: sincere
     label: sincere
-    questionTemplate: "Whoever posted this seems:"
+    questionTemplate: "Whoever posted this seems sincere."
+    preamble: "How much do you disagree or agree with the following statement:"
     scaleMin: 1
     scaleMax: 7
-    minLabel: "Insincere"
-    maxLabel: "Sincere"
+    minLabel: "Strongly disagree"
+    maxLabel: "Strongly agree"
 
   # --- Persuasion-knowledge scale (mechanism 1) ---
   # pk_persuade and pk_motive adapted from Campbell & Kirmani (2000),
