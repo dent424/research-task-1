@@ -36,6 +36,11 @@ export interface DependentVariable {
   // "How much do you disagree or agree with the following statement" for
   // agree/disagree statement items.
   preamble?: string;
+  // single-stimulus only: when true, the assigned stimulus (and its scenario
+  // framing) is hidden on this DV's rating page. Used to collect a pre-stimulus
+  // brand belief (e.g. perceived environmental friendliness) BEFORE the post is
+  // revealed, so the belief isn't contaminated by the post. Defaults to false.
+  hideStimulus?: boolean;
   scaleMin: number;
   scaleMax: number;
   minLabel: string;
@@ -121,9 +126,17 @@ export interface StudyConfig {
     blockIntroTemplate?: string;
     transitionText?: string;
     showUnfamiliarOption?: boolean;
-    // single-stimulus only: "first-pinned-rest-randomized" keeps
-    // dependentVariables[0] first and shuffles the remainder.
+    // single-stimulus only: DV ordering strategy.
+    //  - "first-pinned-rest-randomized": keep dependentVariables[0] first and
+    //    shuffle the remainder.
+    //  - "first-pinned-statements-last": keep dependentVariables[0] first, then
+    //    the remaining non-statement DVs (no `preamble`) shuffled, then the
+    //    agree/disagree statement DVs (those with a `preamble`) shuffled, with a
+    //    statementIntroText transition screen shown before the statement block.
     dvOrderStrategy?: string;
+    // single-stimulus only: transition screen text shown before the agree/disagree
+    // statement block (used by the "first-pinned-statements-last" strategy).
+    statementIntroText?: string;
   };
   // single-stimulus only: one post is assigned per participant (the `post` URL
   // param indexes this list; absent/invalid falls back to a random post).

@@ -428,6 +428,239 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
     });
   });
 
+  describe("statements-last grouping", () => {
+    const STATEMENT_INTRO =
+      "Next, you'll rate how much you disagree or agree with a series of statements.";
+
+    // cringe (pinned) + two non-statement DVs (no preamble) + two agree/disagree
+    // statement DVs (with preamble). With shuffle mocked to identity the realized
+    // order is [cringe, authentic, liking, sincere, pk_motive].
+    const groupedConfig: StudyConfig = {
+      ...mockConfig,
+      dependentVariables: [
+        {
+          id: "cringe",
+          label: "cringe",
+          questionTemplate: "How cringe is this post?",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Not at all",
+          maxLabel: "Extremely",
+        },
+        {
+          id: "authentic",
+          label: "authentic",
+          questionTemplate: "How authentic is this post?",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Not at all authentic",
+          maxLabel: "Extremely authentic",
+        },
+        {
+          id: "liking",
+          label: "liking",
+          questionTemplate: "How much do you like this post?",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Dislike a great deal",
+          maxLabel: "Like a great deal",
+        },
+        {
+          id: "sincere",
+          label: "sincere",
+          questionTemplate: "Whoever posted this seems sincere.",
+          preamble:
+            "How much do you disagree or agree with the following statement:",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Strongly disagree",
+          maxLabel: "Strongly agree",
+        },
+        {
+          id: "pk_motive",
+          label: "persuasion-knowledge (motive)",
+          questionTemplate:
+            "Whoever posted this has an ulterior motive for posting it.",
+          preamble:
+            "How much do you disagree or agree with the following statement:",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Strongly disagree",
+          maxLabel: "Strongly agree",
+        },
+      ],
+      design: {
+        type: "single-stimulus",
+        dvOrderStrategy: "first-pinned-statements-last",
+        statementIntroText: STATEMENT_INTRO,
+      },
+    };
+
+    it("shows non-statement DVs, then a statement-intro screen, then statement DVs", async () => {
+      await act(async () => {
+        render(<StimulusStudyClient config={groupedConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+
+      // 1. cringe (pinned first) — no transition yet
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", { name: /How cringe is this post\?/ })
+        ).toBeInTheDocument()
+      );
+      expect(screen.getByText("1 of 5")).toBeInTheDocument();
+      expect(screen.queryByText(STATEMENT_INTRO)).not.toBeInTheDocument();
+      await rateCurrent(6);
+
+      // 2. authentic — still no transition between non-statement items
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", { name: /How authentic is this post\?/ })
+        ).toBeInTheDocument()
+      );
+      expect(screen.getByText("2 of 5")).toBeInTheDocument();
+      expect(screen.queryByText(STATEMENT_INTRO)).not.toBeInTheDocument();
+      await rateCurrent(5);
+
+      // 3. liking — last non-statement item
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", {
+            name: /How much do you like this post\?/,
+          })
+        ).toBeInTheDocument()
+      );
+      expect(screen.getByText("3 of 5")).toBeInTheDocument();
+      await rateCurrent(4);
+
+      // 4. transition screen (not a rating page — no scale "Next" control)
+      await waitFor(() =>
+        expect(screen.getByText(STATEMENT_INTRO)).toBeInTheDocument()
+      );
+      expect(screen.queryByText("Next")).not.toBeInTheDocument();
+      await act(async () => {
+        fireEvent.click(screen.getByText("Continue"));
+      });
+
+      // 5. first agree/disagree statement DV, with its preamble
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", {
+            name: /Whoever posted this seems sincere\./,
+          })
+        ).toBeInTheDocument()
+      );
+      expect(screen.getByTestId("preamble")).toHaveTextContent(
+        "How much do you disagree or agree"
+      );
+      expect(screen.getByText("4 of 5")).toBeInTheDocument();
+    });
+
+    it("records the grouped dvOrder and flat ratings in the payload", async () => {
+      await act(async () => {
+        render(<StimulusStudyClient config={groupedConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+      await rateCurrent(6); // cringe
+      await rateCurrent(5); // authentic
+      await rateCurrent(4); // liking
+      await act(async () => {
+        fireEvent.click(screen.getByText("Continue")); // statement-intro
+      });
+      await rateCurrent(3); // sincere
+      await rateCurrent(2); // pk_motive
+      await passManipulationCheck();
+      await submitDemographics();
+      await waitForRedirect();
+
+      expect(lastRedirectData.dvOrder).toEqual([
+        "cringe",
+        "authentic",
+        "liking",
+        "sincere",
+        "pk_motive",
+      ]);
+      const ratings = lastRedirectData.ratings as Record<string, number>;
+      expect(ratings).toEqual({
+        cringe: 6,
+        authentic: 5,
+        liking: 4,
+        sincere: 3,
+        pk_motive: 2,
+      });
+    });
+  });
+
+  describe("hideStimulus DV", () => {
+    // env_friendly hides the post (a pre-stimulus brand belief); authentic shows
+    // it. With shuffle mocked to identity the order is [env_friendly, authentic].
+    const hideConfig: StudyConfig = {
+      ...mockConfig,
+      scenarioTemplate: "Imagine you saw the following post from {actor}:",
+      dependentVariables: [
+        {
+          id: "env_friendly",
+          label: "environmental friendliness",
+          questionTemplate: "How environmentally friendly is {actor}?",
+          hideStimulus: true,
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Not at all",
+          maxLabel: "Extremely",
+        },
+        {
+          id: "authentic",
+          label: "authentic",
+          questionTemplate: "If {actor} posted this, how authentic would it feel?",
+          scaleMin: 1,
+          scaleMax: 7,
+          minLabel: "Not at all",
+          maxLabel: "Extremely",
+        },
+      ],
+      design: {
+        type: "single-stimulus",
+        dvOrderStrategy: "first-pinned-rest-randomized",
+      },
+    };
+
+    it("hides the post and scenario on a hideStimulus DV, shows them on a normal DV", async () => {
+      mockCondition = "0"; // actorNoun "person"
+      await act(async () => {
+        render(<StimulusStudyClient config={hideConfig} />);
+      });
+      await passConsent();
+      await passInstructions();
+
+      // Page 1: env_friendly — no post text, no scenario.
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", {
+            name: /How environmentally friendly is person\?/,
+          })
+        ).toBeInTheDocument()
+      );
+      expect(screen.queryByTestId("post-text")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("scenario")).not.toBeInTheDocument();
+      await rateCurrent(5);
+
+      // Page 2: authentic — post text and scenario are shown.
+      await waitFor(() =>
+        expect(
+          screen.getByRole("heading", { name: /how authentic would it feel/ })
+        ).toBeInTheDocument()
+      );
+      expect(screen.getByTestId("post-text")).toHaveTextContent(
+        "feeling so blessed today honestly"
+      );
+      expect(screen.getByTestId("scenario")).toHaveTextContent(
+        /you saw the following post from person/
+      );
+    });
+  });
+
   describe("flow", () => {
     it("goes straight from consent to instructions (no comprehension check)", async () => {
       await act(async () => {

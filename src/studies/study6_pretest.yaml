@@ -1,0 +1,124 @@
+# Study 6 pretest — Brand environmental authenticity (5-brand norming)
+#
+# Norms the five outdoor brands for the Study 6 real-brand Earth Day study:
+# (1) confirm they spread out on perceived environmental friendliness, and
+# (2) measure how authentic an identical Earth Day post feels coming from each —
+# establishing that friendliness predicts tweet-authenticity (the relationship
+# the main Study 6 will exploit).
+#
+# Fully between-subjects: each participant is assigned ONE brand.
+#   - brand: `cond` URL param (0..4 indexes `conditions`); invalid/absent -> random
+# {actor} in every question/scenario resolves to the assigned brand name.
+#
+# Ordering matters: the brand-belief items (environmental friendliness,
+# familiarity, liking) are asked FIRST with the post HIDDEN (hideStimulus),
+# so the beliefs aren't contaminated by the Earth Day post; then a transition
+# screen introduces the post; then the authenticity item is asked WITH the
+# post shown. The dvOrderStrategy pins env_friendly first, randomizes the other
+# two belief items, and places the authenticity item (the only `preamble`
+# "statement" DV) last, after the statement-intro screen.
+
+study:
+  id: study6_pretest
+  title: Study 6 Pretest
+
+comprehensionChecks: []
+
+# Brand-agnostic (do not reveal the assigned brand before the belief items).
+instructions: |
+  You'll answer a few quick questions about a company and one of its social media posts. There are no right or wrong answers — we're interested in your honest impressions.
+
+# Shown above the post — ONLY on pages that show the stimulus (the authenticity
+# item). {actor} -> the assigned brand name.
+scenarioTemplate: "Imagine **{actor}** posted this on social media:"
+
+# One fixed Earth Day post, identical across brands. With a single stimulus every
+# participant sees this one (the `post` URL param is unused here).
+stimuli:
+  - id: earthday
+    text: "Happy Earth Day 🌎 There's no Planet B. Let's all do our part. 💚"
+
+# cond = index into this list (0..4); invalid/absent -> random brand.
+conditions:
+  - key: patagonia
+    actorNoun: Patagonia
+  - key: rei
+    actorNoun: REI
+  - key: yeti
+    actorNoun: Yeti
+  - key: igloo
+    actorNoun: Igloo
+  - key: coleman
+    actorNoun: Coleman
+
+design:
+  type: single-stimulus
+  # env_friendly (dependentVariables[0]) pinned first; the other belief items
+  # (no preamble) randomized; then the authenticity item (the only `preamble`
+  # statement DV) last, introduced by statementIntroText.
+  dvOrderStrategy: first-pinned-statements-last
+  statementIntroText: "Next, you'll see a social media post and answer one question about it."
+
+dependentVariables:
+  # --- Pre-stimulus brand beliefs (post hidden) ---
+  - id: env_friendly
+    label: environmental friendliness
+    questionTemplate: "How environmentally friendly is {actor}?"
+    hideStimulus: true
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all environmentally friendly"
+    maxLabel: "Extremely environmentally friendly"
+  - id: familiarity
+    label: familiarity
+    questionTemplate: "How familiar are you with {actor}?"
+    hideStimulus: true
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all familiar"
+    maxLabel: "Extremely familiar"
+  - id: liking
+    label: liking
+    questionTemplate: "How much do you like {actor}?"
+    hideStimulus: true
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Dislike a great deal"
+    maxLabel: "Like a great deal"
+
+  # --- Post-stimulus: authenticity of the Earth Day post (post shown) ---
+  - id: authentic
+    label: authentic
+    questionTemplate: "how authentic does it feel?"
+    preamble: "Based on the post above,"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all authentic"
+    maxLabel: "Extremely authentic"
+
+# Recognition / attention check shown after the DV battery.
+manipulationCheck:
+  question: "Which company's post did you just rate?"
+  options:
+    - "Patagonia"
+    - "REI"
+    - "Yeti"
+    - "Igloo"
+    - "Coleman"
+    - "I'm not sure"
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+# Study 6 pretest Qualtrics survey (must declare `pid` + `data` embedded-data
+# fields in its Survey Flow to capture the returned payload).
+qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_cXTVTeB37K9oe8K"

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import LikertScale from "./LikertScale";
 import { renderFormattedText } from "@/lib/format";
+import { renderWithEmoji } from "@/lib/emoji";
 
 interface StimulusRatingProps {
   /** Scenario framing shown above the post. Already actor-substituted; may contain **bold**. */
@@ -61,12 +62,14 @@ export default function StimulusRating({
         </p>
       )}
 
-      <blockquote
-        data-testid="post-text"
-        className="w-full max-w-md border-l-4 border-zinc-300 bg-zinc-50 px-5 py-4 text-left text-[17px] leading-snug text-zinc-900"
-      >
-        {postText}
-      </blockquote>
+      {postText && (
+        <blockquote
+          data-testid="post-text"
+          className="w-full max-w-md border-l-4 border-zinc-300 bg-zinc-50 px-5 py-4 text-left text-[17px] leading-snug text-zinc-900"
+        >
+          {renderWithEmoji(postText)}
+        </blockquote>
+      )}
 
       <div className="w-full flex flex-col gap-2">
         {preamble && (

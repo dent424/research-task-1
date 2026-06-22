@@ -19,6 +19,7 @@ type Phase =
   | "comprehension"
   | "instructions"
   | "rating"
+  | "statement-intro"
   | "manipulation-check"
   | "demographics"
   | "redirect"
@@ -40,14 +41,29 @@ interface Assignment {
 }
 
 /**
- * Build the DV order. When dvOrderStrategy === "first-pinned-rest-randomized",
- * dependentVariables[0] (e.g. cringe) stays first and the remainder is shuffled.
- * Otherwise all DVs are shuffled.
+ * Build the DV order from the configured dvOrderStrategy:
+ *  - "first-pinned-rest-randomized": dependentVariables[0] (e.g. cringe) stays
+ *    first; the remainder is shuffled.
+ *  - "first-pinned-statements-last": dependentVariables[0] stays first, then the
+ *    remaining NON-statement DVs (no `preamble`) shuffled, then the agree/disagree
+ *    statement DVs (those with a `preamble`) shuffled. A statement-intro screen is
+ *    shown before the statement block (see handleRatingSubmit / statementStartIndex).
+ *  - otherwise: all DVs are shuffled.
  */
 function buildDvOrder(config: StudyConfig): { dvOrder: string[]; cringePinned: boolean } {
-  const ids = config.dependentVariables.map((dv) => dv.id);
-  const pinned = config.design.dvOrderStrategy === "first-pinned-rest-randomized";
-  if (pinned && ids.length > 0) {
+  const dvs = config.dependentVariables;
+  const ids = dvs.map((dv) => dv.id);
+  const strategy = config.design.dvOrderStrategy;
+  if (strategy === "first-pinned-statements-last" && ids.length > 0) {
+    const [first, ...rest] = dvs;
+    const nonStatements = rest.filter((dv) => !dv.preamble).map((dv) => dv.id);
+    const statements = rest.filter((dv) => dv.preamble).map((dv) => dv.id);
+    return {
+      dvOrder: [first.id, ...shuffle(nonStatements), ...shuffle(statements)],
+      cringePinned: true,
+    };
+  }
+  if (strategy === "first-pinned-rest-randomized" && ids.length > 0) {
     const [first, ...rest] = ids;
     return { dvOrder: [first, ...shuffle(rest)], cringePinned: true };
   }
@@ -240,12 +256,16 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
 
   function handleRatingSubmit(dvId: string, rating: number) {
     setRatings((prev) => ({ ...prev, [dvId]: rating }));
-    const dvOrder = assignment?.dvOrder ?? [];
+    const order = assignment?.dvOrder ?? [];
     const nextIndex = currentDvIndex + 1;
-    if (nextIndex < dvOrder.length) {
-      setCurrentDvIndex(nextIndex);
-    } else {
+    if (nextIndex >= order.length) {
       advanceAfterRating();
+    } else if (groupStatementsLast && nextIndex === statementStartIndex) {
+      // Show the statement-intro screen once, right before the first
+      // agree/disagree statement; the index advances on continue.
+      setPhase("statement-intro");
+    } else {
+      setCurrentDvIndex(nextIndex);
     }
   }
 
@@ -281,6 +301,16 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   const dvOrder = assignment?.dvOrder ?? [];
   const currentDvId = dvOrder[currentDvIndex];
   const currentDv = config.dependentVariables.find((dv) => dv.id === currentDvId);
+  // When grouping statements last, this is the dvOrder index of the first
+  // agree/disagree statement DV (the one-time statement-intro boundary); -1 when
+  // the strategy is off or there are no statement DVs.
+  const groupStatementsLast =
+    config.design.dvOrderStrategy === "first-pinned-statements-last";
+  const statementStartIndex = groupStatementsLast
+    ? dvOrder.findIndex((id) =>
+        Boolean(config.dependentVariables.find((dv) => dv.id === id)?.preamble)
+      )
+    : -1;
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -344,8 +374,8 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
         {phase === "rating" && postText !== undefined && condition && currentDv && (
           <StimulusRating
             key={currentDvId}
-            scenario={scenario}
-            postText={postText}
+            scenario={currentDv.hideStimulus ? "" : scenario}
+            postText={currentDv.hideStimulus ? "" : postText}
             question={resolveActor(currentDv.questionTemplate)}
             preamble={currentDv.preamble}
             scaleMin={currentDv.scaleMin}
@@ -355,6 +385,16 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             currentIndex={currentDvIndex}
             totalCount={dvOrder.length}
             onSubmit={(rating) => handleRatingSubmit(currentDvId, rating)}
+          />
+        )}
+
+        {phase === "statement-intro" && config.design.statementIntroText && (
+          <TransitionScreen
+            text={resolveActor(config.design.statementIntroText)}
+            onContinue={() => {
+              setCurrentDvIndex(statementStartIndex);
+              setPhase("rating");
+            }}
           />
         )}
 

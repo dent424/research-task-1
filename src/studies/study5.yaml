@@ -56,8 +56,11 @@ conditions:
 
 design:
   type: single-stimulus
-  # cringe (dependentVariables[0]) shows first; the rest are randomized, one per page.
-  dvOrderStrategy: first-pinned-rest-randomized
+  # cringe (dependentVariables[0]) shows first; then the non-statement reactions
+  # (authentic, liking) randomized; then a transition screen (statementIntroText);
+  # then the agree/disagree statement DVs (those with a `preamble`) randomized.
+  dvOrderStrategy: first-pinned-statements-last
+  statementIntroText: "Next, you'll rate how much you disagree or agree with a series of statements."
 
 # All 7-point scales. {actor} is replaced by the cell's actorNoun (person/company)
 # and {actors} by its actorNounPlural (people/companies) so process items are
