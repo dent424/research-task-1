@@ -24,9 +24,10 @@ study:
 
 comprehensionChecks: []
 
-# Brand-agnostic (do not reveal the assigned brand before the belief items).
+# Opening page (no questions): introduce the assigned brand. Shown after consent,
+# before the rating items. {actor} -> brand name; **bold** renders bold.
 instructions: |
-  You'll answer a few quick questions about a company and one of its social media posts. There are no right or wrong answers — we're interested in your honest impressions.
+  We're going to ask you about the brand **{actor}**.
 
 # Shown above the post — ONLY on pages that show the stimulus (the authenticity
 # item). {actor} -> the assigned brand name.
@@ -65,7 +66,7 @@ dependentVariables:
   # --- Pre-stimulus brand beliefs (post hidden) ---
   - id: env_friendly
     label: environmental friendliness
-    questionTemplate: "How environmentally friendly is {actor}?"
+    questionTemplate: "How environmentally friendly is **{actor}**?"
     hideStimulus: true
     scaleMin: 1
     scaleMax: 7
@@ -73,7 +74,7 @@ dependentVariables:
     maxLabel: "Extremely environmentally friendly"
   - id: familiarity
     label: familiarity
-    questionTemplate: "How familiar are you with {actor}?"
+    questionTemplate: "How familiar are you with **{actor}**?"
     hideStimulus: true
     scaleMin: 1
     scaleMax: 7
@@ -81,7 +82,7 @@ dependentVariables:
     maxLabel: "Extremely familiar"
   - id: liking
     label: liking
-    questionTemplate: "How much do you like {actor}?"
+    questionTemplate: "How much do you like **{actor}**?"
     hideStimulus: true
     scaleMin: 1
     scaleMax: 7
