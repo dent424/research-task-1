@@ -61,6 +61,8 @@ design:
   statementIntroText: "Next, you'll see a social media post and answer one question about it."
   # Endpoint labels flank the scale (minLabel left, maxLabel right) on every DV.
   labelPlacement: sides
+  # Scenario framing ("Imagine {brand} posted this:") in black instead of gray.
+  scenarioColor: black
 
 dependentVariables:
   # --- Pre-stimulus brand beliefs (post hidden) ---

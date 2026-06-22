@@ -77,6 +77,32 @@ describe("StimulusRating", () => {
     expect(screen.queryByTestId("scenario")).not.toBeInTheDocument();
   });
 
+  it("renders the scenario in gray by default", () => {
+    renderRating("How cringe is this post?");
+    expect(screen.getByTestId("scenario").className).toMatch(/text-zinc-400/);
+  });
+
+  it("renders the scenario in dark text when scenarioColor='black'", () => {
+    render(
+      <StimulusRating
+        scenario={SCENARIO}
+        postText={POST_TEXT}
+        question="How cringe is this post?"
+        scaleMin={1}
+        scaleMax={7}
+        minLabel="Not at all"
+        maxLabel="Extremely"
+        scenarioColor="black"
+        currentIndex={0}
+        totalCount={5}
+        onSubmit={vi.fn()}
+      />
+    );
+    const scenario = screen.getByTestId("scenario");
+    expect(scenario.className).toMatch(/text-zinc-900/);
+    expect(scenario.className).not.toMatch(/text-zinc-400/);
+  });
+
   it("disables Next until a value is selected, then submits the value", () => {
     const onSubmit = vi.fn();
     renderRating("How cringe is this post?", onSubmit);

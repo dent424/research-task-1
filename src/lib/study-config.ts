@@ -141,6 +141,10 @@ export interface StudyConfig {
     //  - "below" (default): labels under the row of buttons.
     //  - "sides": labels flank the buttons (minLabel left, maxLabel right).
     labelPlacement?: "below" | "sides";
+    // single-stimulus only: scenario framing text color.
+    //  - "gray" (default): muted gray (text-zinc-400).
+    //  - "black": dark/near-black (text-zinc-900).
+    scenarioColor?: "gray" | "black";
   };
   // single-stimulus only: one post is assigned per participant (the `post` URL
   // param indexes this list; absent/invalid falls back to a random post).

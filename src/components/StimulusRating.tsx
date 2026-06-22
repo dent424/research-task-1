@@ -20,6 +20,8 @@ interface StimulusRatingProps {
   maxLabel: string;
   /** Likert endpoint-label placement: "below" (default) or "sides". */
   labelPlacement?: "below" | "sides";
+  /** Scenario text color: "gray" (default) or "black". */
+  scenarioColor?: "gray" | "black";
   currentIndex: number;
   totalCount: number;
   onSubmit: (rating: number) => void;
@@ -41,6 +43,7 @@ export default function StimulusRating({
   minLabel,
   maxLabel,
   labelPlacement,
+  scenarioColor,
   currentIndex,
   totalCount,
   onSubmit,
@@ -59,7 +62,9 @@ export default function StimulusRating({
       {scenario && (
         <p
           data-testid="scenario"
-          className="text-base text-center text-zinc-400 leading-relaxed"
+          className={`text-base text-center leading-relaxed ${
+            scenarioColor === "black" ? "text-zinc-900" : "text-zinc-400"
+          }`}
         >
           {renderFormattedText(scenario)}
         </p>

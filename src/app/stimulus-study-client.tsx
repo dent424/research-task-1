@@ -383,6 +383,7 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             minLabel={currentDv.minLabel}
             maxLabel={currentDv.maxLabel}
             labelPlacement={config.design.labelPlacement}
+            scenarioColor={config.design.scenarioColor}
             currentIndex={currentDvIndex}
             totalCount={dvOrder.length}
             onSubmit={(rating) => handleRatingSubmit(currentDvId, rating)}
