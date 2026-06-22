@@ -137,6 +137,10 @@ export interface StudyConfig {
     // single-stimulus only: transition screen text shown before the agree/disagree
     // statement block (used by the "first-pinned-statements-last" strategy).
     statementIntroText?: string;
+    // single-stimulus only: Likert endpoint-label placement for every DV scale.
+    //  - "below" (default): labels under the row of buttons.
+    //  - "sides": labels flank the buttons (minLabel left, maxLabel right).
+    labelPlacement?: "below" | "sides";
   };
   // single-stimulus only: one post is assigned per participant (the `post` URL
   // param indexes this list; absent/invalid falls back to a random post).

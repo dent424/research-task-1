@@ -18,6 +18,8 @@ interface StimulusRatingProps {
   scaleMax: number;
   minLabel: string;
   maxLabel: string;
+  /** Likert endpoint-label placement: "below" (default) or "sides". */
+  labelPlacement?: "below" | "sides";
   currentIndex: number;
   totalCount: number;
   onSubmit: (rating: number) => void;
@@ -38,6 +40,7 @@ export default function StimulusRating({
   scaleMax,
   minLabel,
   maxLabel,
+  labelPlacement,
   currentIndex,
   totalCount,
   onSubmit,
@@ -90,6 +93,7 @@ export default function StimulusRating({
         max={scaleMax}
         minLabel={minLabel}
         maxLabel={maxLabel}
+        labelPlacement={labelPlacement}
         value={value}
         onChange={setValue}
       />

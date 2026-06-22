@@ -58,6 +58,8 @@ design:
   # statement DV) last, introduced by statementIntroText.
   dvOrderStrategy: first-pinned-statements-last
   statementIntroText: "Next, you'll see a social media post and answer one question about it."
+  # Endpoint labels flank the scale (minLabel left, maxLabel right) on every DV.
+  labelPlacement: sides
 
 dependentVariables:
   # --- Pre-stimulus brand beliefs (post hidden) ---
