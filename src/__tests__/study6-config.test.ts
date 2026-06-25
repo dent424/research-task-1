@@ -74,13 +74,15 @@ describe("study6.yaml config contract", () => {
     expect(cringe.maxLabel).toBe("Extremely");
   });
 
-  it("uses the Study 6 pretest authenticity measure verbatim", () => {
+  it("uses the authenticity item: 'How authentic does this post feel?' ('authentic' underlined)", () => {
     const authentic = config.dependentVariables.find(
       (d) => d.id === "authentic"
     );
     expect(authentic).toBeDefined();
-    expect(authentic?.preamble).toBe("Based on the post above,");
-    expect(authentic?.questionTemplate).toBe("how __authentic__ does it feel?"); // "authentic" underlined
+    expect(authentic?.preamble).toBeUndefined(); // standalone question, no lead-in
+    expect(authentic?.questionTemplate).toBe(
+      "How __authentic__ does this post feel?"
+    );
     expect(authentic?.minLabel).toBe("Not at all authentic");
     expect(authentic?.maxLabel).toBe("Extremely authentic");
     expect(authentic?.scaleMin).toBe(1);

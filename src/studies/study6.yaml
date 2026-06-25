@@ -76,11 +76,10 @@ dependentVariables:
     minLabel: "Not at all"
     maxLabel: "Extremely"
 
-  # --- Authenticity (from the Study 6 pretest), post shown ---
+  # --- Authenticity (Study 5 wording, "authentic" underlined), post shown ---
   - id: authentic
     label: authentic
-    questionTemplate: "how __authentic__ does it feel?"
-    preamble: "Based on the post above,"
+    questionTemplate: "How __authentic__ does this post feel?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all authentic"
