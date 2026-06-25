@@ -1,0 +1,94 @@
+# Study 6 — Brand Cringe: Coleman vs. Patagonia (2-cell between-subjects)
+#
+# The same Earth Day post (from the Study 6 pretest) is attributed to a brand
+# with low environmental credibility (Coleman) vs. high (Patagonia). Prediction:
+# the identical post cringes more / feels less authentic from the low-credibility
+# brand (schema incongruity). Cringe is measured FIRST, then authenticity; the
+# post is shown on both pages.
+#
+# Fully between-subjects: brand = `cond` URL param (0 = Coleman, 1 = Patagonia);
+# invalid/absent -> random. Single fixed post, so the `post` param is unused.
+# {actor} in the intro/scenario resolves to the assigned brand name.
+
+study:
+  id: study6
+  title: Study 6
+
+comprehensionChecks: []
+
+# Opening page (no questions): names the assigned brand and frames the task.
+instructions: |
+  We're going to ask you about a social media post about the brand **{actor}**.
+
+  On the next screens you'll see the post and answer a few questions about it. There are no right or wrong answers — we're interested in your honest reactions.
+
+# Shown above the post on every rating page. {actor} -> assigned brand name.
+scenarioTemplate: "Imagine **{actor}** posted this on social media:"
+
+# One fixed Earth Day post (identical to the Study 6 pretest), shown to everyone.
+stimuli:
+  - id: earthday
+    text: "Happy Earth Day 🌎 There's no Planet B. Let's all do our part. 💚"
+
+# cond = index into this list (0 = Coleman, 1 = Patagonia); invalid/absent -> random.
+conditions:
+  - key: coleman
+    actorNoun: Coleman
+  - key: patagonia
+    actorNoun: Patagonia
+
+design:
+  type: single-stimulus
+  # cringe (dependentVariables[0]) pinned first; authentic is the only other DV,
+  # so the realized order is always [cringe, authentic]. No statement-intro
+  # transition (the post is shown on both pages).
+  dvOrderStrategy: first-pinned-rest-randomized
+  labelPlacement: sides
+  scenarioColor: black
+
+dependentVariables:
+  # --- Primary DV: cringe (from Study 5), pinned first, post shown ---
+  - id: cringe
+    label: cringe
+    questionTemplate: "How cringe is this post?"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all"
+    maxLabel: "Extremely"
+
+  # --- Authenticity (from the Study 6 pretest), post shown ---
+  - id: authentic
+    label: authentic
+    questionTemplate: "how authentic does it feel?"
+    preamble: "Based on the post above,"
+    scaleMin: 1
+    scaleMax: 7
+    minLabel: "Not at all authentic"
+    maxLabel: "Extremely authentic"
+
+# Brand-recognition / attention check shown after the DVs (foils included).
+manipulationCheck:
+  question: "Which company's post did you just rate?"
+  options:
+    - "Patagonia"
+    - "REI"
+    - "Yeti"
+    - "Igloo"
+    - "Coleman"
+    - "I'm not sure"
+
+demographics:
+  age:
+    label: "What is your age?"
+    placeholder: "Enter your age"
+  gender:
+    label: "What is your gender?"
+    options:
+      - "Man"
+      - "Woman"
+      - "Non-binary"
+      - "Prefer not to say"
+
+# Study 6 Qualtrics survey (its Survey Flow must declare `pid` + `data`
+# embedded-data fields to capture the returned payload).
+qualtricsReturnUrl: "https://uic.ca1.qualtrics.com/jfe/form/SV_6R7kZVCdynXtNZQ"

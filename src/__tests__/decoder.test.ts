@@ -664,3 +664,139 @@ describe("Study 2 decoder.py compatibility", () => {
     expect(p2Long.every((r) => r.pid === "P401")).toBe(true);
   });
 });
+
+describe("Study 6 decoder.py compatibility", () => {
+  // Study 6 is single-stimulus: each participant gives ONE cringe rating and ONE
+  // authenticity rating, so `ratings` is FLAT — ratings[dvId] = number (no
+  // per-category nesting like Studies 1-2). Each DV id becomes a single column.
+
+  /** Replicate Study 6 decoder.py decode_row logic in JS. */
+  function flattenStudy6Row(
+    data: Record<string, unknown>
+  ): Record<string, unknown> {
+    // None/undefined -> "" but preserve real falsy values like 0.
+    const nn = (v: unknown, d: unknown = "") =>
+      v === null || v === undefined ? d : v;
+    const flat: Record<string, unknown> = {
+      pid: nn(data.pid),
+      conditionKey: nn(data.conditionKey),
+      condIndex: nn(data.condIndex),
+      cond: nn(data.cond),
+      condFromUrl: data.condFromUrl ?? false,
+      postId: nn(data.postId),
+      postIndex: nn(data.postIndex),
+      postFromUrl: data.postFromUrl ?? false,
+      dvOrder: ((data.dvOrder as string[]) ?? []).join("|"),
+      cringePinned: data.cringePinned ?? false,
+      manipulationCheck: nn(data.manipulationCheck),
+      completed: data.completed ?? false,
+      age: nn(data.age),
+      gender: nn(data.gender),
+    };
+
+    const timing = (data.timing as Record<string, number>) ?? {};
+    flat.timing_total_ms = nn(timing.totalMs);
+
+    const ratings = (data.ratings as Record<string, number>) ?? {};
+    for (const dvId of Object.keys(ratings).sort()) {
+      flat[dvId] = ratings[dvId];
+    }
+    return flat;
+  }
+
+  const META_COLUMNS = [
+    "pid",
+    "conditionKey",
+    "condIndex",
+    "cond",
+    "condFromUrl",
+    "postId",
+    "postIndex",
+    "postFromUrl",
+    "dvOrder",
+    "cringePinned",
+    "manipulationCheck",
+    "timing_total_ms",
+    "completed",
+    "age",
+    "gender",
+  ];
+
+  // Mirrors exactly what stimulus-study-client.tsx builds in studyDataRef for a
+  // Study 6 participant in the Coleman cell.
+  const colemanData = {
+    pid: "P001",
+    cond: "0",
+    condIndex: 0,
+    conditionKey: "coleman",
+    condFromUrl: true,
+    postIndex: 0,
+    postId: "earthday",
+    postFromUrl: false,
+    dvOrder: ["cringe", "authentic"],
+    cringePinned: true,
+    ratings: { cringe: 6, authentic: 2 },
+    manipulationCheck: "Coleman",
+    timing: { totalMs: 84000 },
+    completed: true,
+    age: "34",
+    gender: "Man",
+  };
+
+  it("round-trips and flattens a single-stimulus payload to flat DV columns", () => {
+    const encoded = toBase64(JSON.stringify(colemanData));
+    const decoded = JSON.parse(fromBase64(encoded));
+    const flat = flattenStudy6Row(decoded);
+
+    expect(flat.pid).toBe("P001");
+    expect(flat.conditionKey).toBe("coleman");
+    expect(flat.condIndex).toBe(0); // 0 must survive (not coerced to "")
+    expect(flat.cond).toBe("0");
+    expect(flat.condFromUrl).toBe(true);
+    expect(flat.postId).toBe("earthday");
+    expect(flat.dvOrder).toBe("cringe|authentic");
+    expect(flat.cringePinned).toBe(true);
+    expect(flat.manipulationCheck).toBe("Coleman");
+    expect(flat.completed).toBe(true);
+    expect(flat.timing_total_ms).toBe(84000);
+    expect(flat.age).toBe("34");
+    expect(flat.gender).toBe("Man");
+
+    // Flat ratings: cringe + authentic as single columns (no per-category nesting).
+    expect(flat.cringe).toBe(6);
+    expect(flat.authentic).toBe(2);
+
+    // Exactly two rating (non-meta) columns.
+    const ratingKeys = Object.keys(flat).filter(
+      (k) => !META_COLUMNS.includes(k)
+    );
+    expect(ratingKeys.sort()).toEqual(["authentic", "cringe"]);
+  });
+
+  it("produces identical columns across the Coleman and Patagonia cells", () => {
+    const patagoniaData = {
+      ...colemanData,
+      pid: "P002",
+      cond: "1",
+      condIndex: 1,
+      conditionKey: "patagonia",
+      ratings: { cringe: 2, authentic: 6 },
+      manipulationCheck: "Patagonia",
+      age: "41",
+      gender: "Woman",
+    };
+
+    const flatC = flattenStudy6Row(
+      JSON.parse(fromBase64(toBase64(JSON.stringify(colemanData))))
+    );
+    const flatP = flattenStudy6Row(
+      JSON.parse(fromBase64(toBase64(JSON.stringify(patagoniaData))))
+    );
+
+    expect(Object.keys(flatC).sort()).toEqual(Object.keys(flatP).sort());
+    expect(flatP.conditionKey).toBe("patagonia");
+    expect(flatP.condIndex).toBe(1);
+    expect(flatP.cringe).toBe(2);
+    expect(flatP.authentic).toBe(6);
+  });
+});
