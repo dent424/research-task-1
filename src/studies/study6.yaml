@@ -14,13 +14,33 @@ study:
   id: study6
   title: Study 6
 
-comprehensionChecks: []
-
-# Opening page (no questions): names the assigned brand and frames the task.
-instructions: |
-  We're going to ask you about a social media post about the brand **{actor}**.
-
-  On the next screens you'll see the post and answer a few questions about it. There are no right or wrong answers — we're interested in your honest reactions.
+# Shown right after consent (the "situation" page): a short task description
+# followed by a one-question comprehension check (the component renders the
+# `definition` and the `question` together). One wrong answer shows the
+# kickWarning; a second wrong answer boots the participant (onFail ->
+# failed-check). {actor} is NOT substituted in comprehension text, so the
+# description is brand-generic (the brand appears with the post on the rating
+# pages).
+comprehensionChecks:
+  - id: task
+    definition: |
+      In this task, you'll see a single social media post from a company and
+      answer a couple of short questions about how the post comes across to
+      you. There are no right or wrong answers — we're just interested in your
+      honest reactions.
+    question: "What is this task about?"
+    options:
+      - text: "Reading a company's social media post and giving your honest reactions to it"
+        correct: true
+      - text: "Writing your own social media posts for a company"
+        correct: false
+      - text: "Rating a company's products and customer service"
+        correct: false
+      - text: "Designing a new advertisement for a company"
+        correct: false
+    retryMessage: "That's not quite right. Please re-read the description above and try again."
+    maxAttempts: 2
+    kickWarning: "Please read the description carefully. If you answer incorrectly again, you won't be able to continue with the study."
 
 # Shown above the post on every rating page. {actor} -> assigned brand name.
 scenarioTemplate: "Imagine **{actor}** posted this on social media:"
@@ -50,7 +70,7 @@ dependentVariables:
   # --- Primary DV: cringe (from Study 5), pinned first, post shown ---
   - id: cringe
     label: cringe
-    questionTemplate: "How cringe is this post?"
+    questionTemplate: "How __cringe__ is this post?"
     scaleMin: 1
     scaleMax: 7
     minLabel: "Not at all"
@@ -59,7 +79,7 @@ dependentVariables:
   # --- Authenticity (from the Study 6 pretest), post shown ---
   - id: authentic
     label: authentic
-    questionTemplate: "how authentic does it feel?"
+    questionTemplate: "how __authentic__ does it feel?"
     preamble: "Based on the post above,"
     scaleMin: 1
     scaleMax: 7

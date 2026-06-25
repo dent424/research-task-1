@@ -44,6 +44,17 @@ describe("StimulusRating", () => {
     ).toBeInTheDocument();
   });
 
+  it("underlines a __word__ in the question (renders a <u> element)", () => {
+    renderRating("How __cringe__ is this post?");
+    // Full visible text is unchanged...
+    expect(
+      screen.getByRole("heading", { name: /How cringe is this post\?/ })
+    ).toBeInTheDocument();
+    // ...and the marked word renders inside a <u>.
+    const underlined = screen.getByText("cringe");
+    expect(underlined.tagName).toBe("U");
+  });
+
   it("renders a left-justified preamble above the question when provided", () => {
     render(
       <StimulusRating

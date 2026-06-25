@@ -67,7 +67,7 @@ describe("study6.yaml config contract", () => {
     expect(cringe.id).toBe("cringe");
     expect(cringe.preamble).toBeUndefined();
     expect(cringe.hideStimulus).toBeFalsy();
-    expect(cringe.questionTemplate).toBe("How cringe is this post?");
+    expect(cringe.questionTemplate).toBe("How __cringe__ is this post?"); // "cringe" underlined
     expect(cringe.scaleMin).toBe(1);
     expect(cringe.scaleMax).toBe(7);
     expect(cringe.minLabel).toBe("Not at all");
@@ -80,7 +80,7 @@ describe("study6.yaml config contract", () => {
     );
     expect(authentic).toBeDefined();
     expect(authentic?.preamble).toBe("Based on the post above,");
-    expect(authentic?.questionTemplate).toBe("how authentic does it feel?");
+    expect(authentic?.questionTemplate).toBe("how __authentic__ does it feel?"); // "authentic" underlined
     expect(authentic?.minLabel).toBe("Not at all authentic");
     expect(authentic?.maxLabel).toBe("Extremely authentic");
     expect(authentic?.scaleMin).toBe(1);
@@ -104,5 +104,20 @@ describe("study6.yaml config contract", () => {
   it("has a qualtricsReturnUrl set", () => {
     expect(typeof config.qualtricsReturnUrl).toBe("string");
     expect(config.qualtricsReturnUrl.length).toBeGreaterThan(0);
+  });
+
+  it("gates entry with a task-comprehension check that boots after a second failure", () => {
+    // The situation description now lives in the comprehension check, so there
+    // is no separate instructions page.
+    expect(config.instructions).toBeUndefined();
+    expect(config.comprehensionChecks).toHaveLength(1);
+    const check = config.comprehensionChecks[0];
+    expect(check.definition.length).toBeGreaterThan(0);
+    expect(check.question.length).toBeGreaterThan(0);
+    expect(check.maxAttempts).toBe(2); // allow one failure, boot on the second
+    expect((check.kickWarning ?? "").length).toBeGreaterThan(0);
+    // exactly one correct option, with at least three options total
+    expect(check.options.filter((o) => o.correct)).toHaveLength(1);
+    expect(check.options.length).toBeGreaterThanOrEqual(3);
   });
 });

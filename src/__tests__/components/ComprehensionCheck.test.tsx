@@ -135,4 +135,34 @@ describe("ComprehensionCheck", () => {
 
     mockRandom.mockRestore();
   });
+
+  it("warns after one wrong answer and boots (onFail) after a second (maxAttempts=2)", () => {
+    const onPass = vi.fn();
+    const onFail = vi.fn();
+    render(
+      <ComprehensionCheck
+        {...defaultProps}
+        onPass={onPass}
+        onFail={onFail}
+        maxAttempts={2}
+        kickWarning="One more wrong answer and you won't be able to continue."
+      />
+    );
+
+    // First wrong answer -> warning shown, not yet booted.
+    fireEvent.click(screen.getByText("A type of video game"));
+    fireEvent.click(screen.getByText("Submit"));
+    expect(
+      screen.getByText(
+        "One more wrong answer and you won't be able to continue."
+      )
+    ).toBeInTheDocument();
+    expect(onFail).not.toHaveBeenCalled();
+
+    // Second wrong answer -> boot.
+    fireEvent.click(screen.getByText("A cooking recipe"));
+    fireEvent.click(screen.getByText("Submit"));
+    expect(onFail).toHaveBeenCalledTimes(1);
+    expect(onPass).not.toHaveBeenCalled();
+  });
 });
