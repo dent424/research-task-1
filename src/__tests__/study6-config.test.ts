@@ -103,6 +103,25 @@ describe("study6.yaml config contract", () => {
     }
   });
 
+  it("gives each brand a black-and-white logo asset under /images/study6", () => {
+    const conditions = config.conditions ?? [];
+    const coleman = conditions.find((c) => c.key === "coleman");
+    const patagonia = conditions.find((c) => c.key === "patagonia");
+    expect(coleman?.logo).toBe("/images/study6/coleman.svg");
+    expect(patagonia?.logo).toBe("/images/study6/patagonia.svg");
+    expect((coleman?.logoAlt ?? "").length).toBeGreaterThan(0);
+    expect((patagonia?.logoAlt ?? "").length).toBeGreaterThan(0);
+  });
+
+  it("asks a brand-familiarity question (Yes/No/Not sure) naming the assigned brand", () => {
+    const bf = config.brandFamiliarity;
+    expect(bf).toBeDefined();
+    // {actor} so the brand name is substituted at render time; "heard of" wording.
+    expect(bf?.question).toMatch(/\{actor\}/);
+    expect(bf?.question.toLowerCase()).toContain("heard of");
+    expect(bf?.options).toEqual(["Yes", "No", "Not sure"]);
+  });
+
   it("has a qualtricsReturnUrl set", () => {
     expect(typeof config.qualtricsReturnUrl).toBe("string");
     expect(config.qualtricsReturnUrl.length).toBeGreaterThan(0);

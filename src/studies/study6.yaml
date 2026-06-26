@@ -18,9 +18,9 @@ study:
 # followed by a one-question comprehension check (the component renders the
 # `definition` and the `question` together). One wrong answer shows the
 # kickWarning; a second wrong answer boots the participant (onFail ->
-# failed-check). {actor} is NOT substituted in comprehension text, so the
-# description is brand-generic (the brand appears with the post on the rating
-# pages).
+# failed-check). {actor} is NOT substituted in comprehension text, so the task
+# description stays brand-generic, but the assigned brand's logo is shown at the
+# top of this page (and the brand name appears with the post on the rating pages).
 comprehensionChecks:
   - id: task
     definition: |
@@ -51,11 +51,17 @@ stimuli:
     text: "Happy Earth Day 🌎 There's no Planet B. Let's all do our part. 💚"
 
 # cond = index into this list (0 = Coleman, 1 = Patagonia); invalid/absent -> random.
+# `logo` is a black-and-white wordmark shown on the task page (top) and as the
+# post card's header. The two logos are matched in color (mono) and display size.
 conditions:
   - key: coleman
     actorNoun: Coleman
+    logo: /images/study6/coleman.svg
+    logoAlt: Coleman logo
   - key: patagonia
     actorNoun: Patagonia
+    logo: /images/study6/patagonia.svg
+    logoAlt: Patagonia logo
 
 design:
   type: single-stimulus
@@ -95,6 +101,15 @@ manipulationCheck:
     - "Igloo"
     - "Coleman"
     - "I'm not sure"
+
+# Asked after the attention check, before demographics. {actor} -> assigned brand.
+# Options are quoted because YAML 1.1 reads bare Yes/No as booleans.
+brandFamiliarity:
+  question: "Before today, had you heard of **{actor}**?"
+  options:
+    - "Yes"
+    - "No"
+    - "Not sure"
 
 demographics:
   age:

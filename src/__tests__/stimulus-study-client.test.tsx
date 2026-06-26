@@ -734,3 +734,178 @@ describe("StimulusStudyClient — single-stimulus between-subjects", () => {
     });
   });
 });
+
+// ===========================================================================
+// Study 6 shape: brand logos on the task page + post card, and a brand-familiarity
+// question between the attention check and demographics. A SEPARATE config — the
+// base mockConfig above must stay free of brandFamiliarity so its flow helpers
+// (completeStudy/submitDemographics) still reach demographics directly.
+// ===========================================================================
+
+describe("StimulusStudyClient — brand logo + familiarity (Study 6 shape)", () => {
+  const brandConfig: StudyConfig = {
+    ...mockConfig,
+    comprehensionChecks: [
+      {
+        id: "task",
+        definition: "In this task you'll see a post and answer questions.",
+        question: "What is this task about?",
+        options: [
+          { text: "Reading a post and reacting to it", correct: true },
+          { text: "Writing posts", correct: false },
+          { text: "Rating products", correct: false },
+        ],
+        retryMessage: "Try again.",
+        maxAttempts: 2,
+        kickWarning: "One more wrong answer and you're out.",
+      },
+    ],
+    instructions: undefined, // Study 6 has no instructions page
+    scenarioTemplate: "Imagine **{actor}** posted this on social media:",
+    conditions: [
+      {
+        key: "coleman",
+        actorNoun: "Coleman",
+        logo: "/images/study6/coleman.svg",
+        logoAlt: "Coleman logo",
+      },
+      {
+        key: "patagonia",
+        actorNoun: "Patagonia",
+        logo: "/images/study6/patagonia.svg",
+        logoAlt: "Patagonia logo",
+      },
+    ],
+    dependentVariables: [
+      {
+        id: "cringe",
+        label: "cringe",
+        questionTemplate: "How cringe is this post?",
+        scaleMin: 1,
+        scaleMax: 7,
+        minLabel: "Not at all",
+        maxLabel: "Extremely",
+      },
+      {
+        id: "authentic",
+        label: "authentic",
+        questionTemplate: "How authentic does this post feel?",
+        scaleMin: 1,
+        scaleMax: 7,
+        minLabel: "Not at all authentic",
+        maxLabel: "Extremely authentic",
+      },
+    ],
+    design: {
+      type: "single-stimulus",
+      dvOrderStrategy: "first-pinned-rest-randomized",
+    },
+    manipulationCheck: {
+      question: "Which company's post did you just rate?",
+      options: ["Patagonia", "Coleman", "I'm not sure"],
+    },
+    brandFamiliarity: {
+      question: "Before today, had you heard of **{actor}**?",
+      options: ["Yes", "No", "Not sure"],
+    },
+  };
+
+  async function passComprehensionCheck() {
+    await waitFor(() => expect(screen.getByText("Submit")).toBeInTheDocument());
+    await act(async () => {
+      fireEvent.click(screen.getByText("Reading a post and reacting to it"));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("Submit"));
+    });
+  }
+
+  async function passManip(option: string) {
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Which company's post did you just rate\?/)
+      ).toBeInTheDocument()
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText(option));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("Continue"));
+    });
+  }
+
+  it("shows the brand logo on the task page and post card, then asks familiarity after the attention check", async () => {
+    mockCondition = "0"; // Coleman
+    await act(async () => {
+      render(<StimulusStudyClient config={brandConfig} />);
+    });
+
+    await passConsent();
+
+    // Task/comprehension page shows the assigned brand's logo at the top.
+    await waitFor(() =>
+      expect(screen.getByText("What is this task about?")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("brand-logo")).toHaveAttribute(
+      "src",
+      "/images/study6/coleman.svg"
+    );
+    await passComprehensionCheck();
+
+    // Rating page renders the post as a social-media card with the logo header.
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: /How cringe is this post\?/ })
+      ).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("post-card")).toBeInTheDocument();
+    expect(screen.getByTestId("brand-logo")).toBeInTheDocument();
+
+    await rateCurrent(6); // cringe
+    await rateCurrent(3); // authentic
+
+    // Attention check, then the familiarity question naming the brand.
+    await passManip("Coleman");
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: /heard of Coleman/ })
+      ).toBeInTheDocument()
+    );
+    expect(screen.queryByText(/\{actor\}/)).not.toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText("Not sure"));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("Continue"));
+    });
+
+    await submitDemographics("30", "Woman");
+    await waitForRedirect();
+
+    expect(lastRedirectData.brandFamiliarity).toBe("Not sure");
+  });
+
+  it("skips the familiarity question when brandFamiliarity is not configured", async () => {
+    const noFamiliarity: StudyConfig = {
+      ...brandConfig,
+      brandFamiliarity: undefined,
+    };
+    mockCondition = "0";
+    await act(async () => {
+      render(<StimulusStudyClient config={noFamiliarity} />);
+    });
+    await passConsent();
+    await passComprehensionCheck();
+    await rateCurrent(6);
+    await rateCurrent(3);
+    await passManip("Coleman");
+    // Straight to demographics — no familiarity heading.
+    await waitFor(() =>
+      expect(screen.getByPlaceholderText("Enter your age")).toBeInTheDocument()
+    );
+    expect(
+      screen.queryByRole("heading", { name: /heard of/ })
+    ).not.toBeInTheDocument();
+  });
+});

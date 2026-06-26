@@ -165,4 +165,22 @@ describe("ComprehensionCheck", () => {
     expect(onFail).toHaveBeenCalledTimes(1);
     expect(onPass).not.toHaveBeenCalled();
   });
+
+  it("shows a brand logo at the top when logoSrc is provided", () => {
+    render(
+      <ComprehensionCheck
+        {...defaultProps}
+        logoSrc="/images/study6/coleman.svg"
+        logoAlt="Coleman logo"
+      />
+    );
+    const logo = screen.getByTestId("brand-logo");
+    expect(logo).toHaveAttribute("src", "/images/study6/coleman.svg");
+    expect(logo).toHaveAttribute("alt", "Coleman logo");
+  });
+
+  it("shows no logo when logoSrc is omitted", () => {
+    render(<ComprehensionCheck {...defaultProps} />);
+    expect(screen.queryByTestId("brand-logo")).not.toBeInTheDocument();
+  });
 });

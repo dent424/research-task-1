@@ -91,6 +91,11 @@ export interface StimulusCondition {
   handle?: string; // optional handle (unused by the scenario presentation)
   descriptor?: string;
   avatar?: string;
+  // Brand logo shown on the task page and as the post card's header (e.g.
+  // "/images/study6/coleman.svg"). When absent, no logo is shown and the post
+  // renders as the plain blockquote.
+  logo?: string;
+  logoAlt?: string; // alt text for the logo image
 }
 
 export interface StimulusItem {
@@ -103,6 +108,17 @@ export interface StimulusItem {
  * the DVs). Used as a manipulation check; the selected option is recorded.
  */
 export interface ManipulationCheckConfig {
+  question: string;
+  options: string[];
+}
+
+/**
+ * A single forced-choice item asked AFTER the manipulation/attention check and
+ * BEFORE demographics, recording whether the participant had heard of the
+ * assigned brand. `question` may contain {actor} (replaced by the brand name)
+ * and **bold** markup.
+ */
+export interface BrandFamiliarityConfig {
   question: string;
   options: string[];
 }
@@ -154,6 +170,9 @@ export interface StudyConfig {
   scenarioTemplate?: string;
   conditions?: StimulusCondition[];
   manipulationCheck?: ManipulationCheckConfig;
+  // single-stimulus only: a "had you heard of {brand}?" item shown after the
+  // manipulation check and before demographics.
+  brandFamiliarity?: BrandFamiliarityConfig;
   instructions?: string;
   freeResponse?: FreeResponseConfig;
   demographics?: DemographicsConfig;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import LikertScale from "./LikertScale";
+import BrandLogo from "./BrandLogo";
 import { renderFormattedText } from "@/lib/format";
 import { renderWithEmoji } from "@/lib/emoji";
 
@@ -22,6 +23,13 @@ interface StimulusRatingProps {
   labelPlacement?: "below" | "sides";
   /** Scenario text color: "gray" (default) or "black". */
   scenarioColor?: "gray" | "black";
+  /**
+   * Brand logo for the assigned cell. When provided, the post renders as a
+   * generic social-media card (logo header + post text + engagement icons)
+   * instead of the plain blockquote.
+   */
+  logoSrc?: string;
+  logoAlt?: string;
   currentIndex: number;
   totalCount: number;
   onSubmit: (rating: number) => void;
@@ -44,6 +52,8 @@ export default function StimulusRating({
   maxLabel,
   labelPlacement,
   scenarioColor,
+  logoSrc,
+  logoAlt,
   currentIndex,
   totalCount,
   onSubmit,
@@ -70,14 +80,47 @@ export default function StimulusRating({
         </p>
       )}
 
-      {postText && (
+      {postText && logoSrc ? (
+        <div
+          data-testid="post-card"
+          className="w-full max-w-md overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left shadow-sm"
+        >
+          <div className="flex items-center justify-between px-5 pt-4">
+            <BrandLogo src={logoSrc} alt={logoAlt ?? ""} className="h-7" />
+            <span className="text-sm text-zinc-400">· 2h</span>
+          </div>
+          <div
+            data-testid="post-text"
+            className="px-5 py-3 text-[17px] leading-snug text-zinc-900"
+          >
+            {renderWithEmoji(postText)}
+          </div>
+          <div
+            data-testid="post-engagement"
+            aria-hidden="true"
+            className="flex gap-8 border-t border-zinc-100 px-5 py-3 text-zinc-400"
+          >
+            {/* Generic, non-interactive engagement glyphs (no platform branding). */}
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M12 20.5l-1.45-1.32C5.4 14.5 2 11.4 2 7.6 2 5 4 3 6.5 3c1.74 0 3.41.81 4.5 2.09C12.09 3.81 13.76 3 15.5 3 18 3 20 5 20 7.6c0 3.8-3.4 6.9-8.55 11.58z" strokeLinejoin="round" />
+            </svg>
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M21 11.5a8.38 8.38 0 01-8.5 8.5 9 9 0 01-4-.9L3 21l1.9-5.5A8.38 8.38 0 014 11.5 8.5 8.5 0 0112.5 3 8.5 8.5 0 0121 11.5z" strokeLinejoin="round" />
+            </svg>
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 16V3m0 0L8 7m4-4l4 4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+      ) : postText ? (
         <blockquote
           data-testid="post-text"
           className="w-full max-w-md border-l-4 border-zinc-300 bg-zinc-50 px-5 py-4 text-left text-[17px] leading-snug text-zinc-900"
         >
           {renderWithEmoji(postText)}
         </blockquote>
-      )}
+      ) : null}
 
       <div className="w-full flex flex-col gap-2">
         {preamble && (

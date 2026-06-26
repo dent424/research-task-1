@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { shuffleWithIndex } from "@/lib/shuffle";
+import BrandLogo from "./BrandLogo";
 
 interface ComprehensionOption {
   text: string;
@@ -17,6 +18,9 @@ interface ComprehensionCheckProps {
   maxAttempts?: number;
   kickWarning?: string;
   onFail?: () => void;
+  /** Optional brand logo shown centered above the definition. */
+  logoSrc?: string;
+  logoAlt?: string;
 }
 
 export default function ComprehensionCheck({
@@ -28,6 +32,8 @@ export default function ComprehensionCheck({
   maxAttempts,
   kickWarning,
   onFail,
+  logoSrc,
+  logoAlt,
 }: ComprehensionCheckProps) {
   const [selected, setSelected] = useState<number | null>(null);
   const [wrongCount, setWrongCount] = useState(0);
@@ -52,6 +58,12 @@ export default function ComprehensionCheck({
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl text-left">
+      {logoSrc && (
+        <div className="flex justify-center">
+          <BrandLogo src={logoSrc} alt={logoAlt ?? ""} />
+        </div>
+      )}
+
       <div className="whitespace-pre-line text-zinc-700 leading-relaxed">
         {definition.trim()}
       </div>

@@ -689,6 +689,7 @@ describe("Study 6 decoder.py compatibility", () => {
       dvOrder: ((data.dvOrder as string[]) ?? []).join("|"),
       cringePinned: data.cringePinned ?? false,
       manipulationCheck: nn(data.manipulationCheck),
+      brandFamiliarity: nn(data.brandFamiliarity),
       completed: data.completed ?? false,
       age: nn(data.age),
       gender: nn(data.gender),
@@ -716,6 +717,7 @@ describe("Study 6 decoder.py compatibility", () => {
     "dvOrder",
     "cringePinned",
     "manipulationCheck",
+    "brandFamiliarity",
     "timing_total_ms",
     "completed",
     "age",
@@ -737,6 +739,7 @@ describe("Study 6 decoder.py compatibility", () => {
     cringePinned: true,
     ratings: { cringe: 6, authentic: 2 },
     manipulationCheck: "Coleman",
+    brandFamiliarity: "Yes",
     timing: { totalMs: 84000 },
     completed: true,
     age: "34",
@@ -757,6 +760,7 @@ describe("Study 6 decoder.py compatibility", () => {
     expect(flat.dvOrder).toBe("cringe|authentic");
     expect(flat.cringePinned).toBe(true);
     expect(flat.manipulationCheck).toBe("Coleman");
+    expect(flat.brandFamiliarity).toBe("Yes");
     expect(flat.completed).toBe(true);
     expect(flat.timing_total_ms).toBe(84000);
     expect(flat.age).toBe("34");
@@ -782,6 +786,7 @@ describe("Study 6 decoder.py compatibility", () => {
       conditionKey: "patagonia",
       ratings: { cringe: 2, authentic: 6 },
       manipulationCheck: "Patagonia",
+      brandFamiliarity: "Not sure",
       age: "41",
       gender: "Woman",
     };
@@ -798,5 +803,7 @@ describe("Study 6 decoder.py compatibility", () => {
     expect(flatP.condIndex).toBe(1);
     expect(flatP.cringe).toBe(2);
     expect(flatP.authentic).toBe(6);
+    expect(flatC.brandFamiliarity).toBe("Yes");
+    expect(flatP.brandFamiliarity).toBe("Not sure");
   });
 });

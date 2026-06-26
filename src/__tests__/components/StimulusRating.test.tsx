@@ -42,6 +42,8 @@ describe("StimulusRating", () => {
     expect(
       screen.getByRole("heading", { name: /How cringe is this post\?/ })
     ).toBeInTheDocument();
+    // Without a logo there is no social-media card — just the plain blockquote.
+    expect(screen.queryByTestId("post-card")).not.toBeInTheDocument();
   });
 
   it("underlines a __word__ in the question (renders a <u> element)", () => {
@@ -112,6 +114,35 @@ describe("StimulusRating", () => {
     const scenario = screen.getByTestId("scenario");
     expect(scenario.className).toMatch(/text-zinc-900/);
     expect(scenario.className).not.toMatch(/text-zinc-400/);
+  });
+
+  it("renders the post as a social-media card with the brand logo when logoSrc is given", () => {
+    render(
+      <StimulusRating
+        scenario={SCENARIO}
+        postText={POST_TEXT}
+        question="How cringe is this post?"
+        scaleMin={1}
+        scaleMax={7}
+        minLabel="Not at all"
+        maxLabel="Extremely"
+        logoSrc="/images/study6/coleman.svg"
+        logoAlt="Coleman logo"
+        currentIndex={0}
+        totalCount={2}
+        onSubmit={vi.fn()}
+      />
+    );
+    // The card wraps the post, with a brand-logo header and an engagement footer.
+    expect(screen.getByTestId("post-card")).toBeInTheDocument();
+    const logo = screen.getByTestId("brand-logo");
+    expect(logo).toHaveAttribute("src", "/images/study6/coleman.svg");
+    expect(logo).toHaveAttribute("alt", "Coleman logo");
+    expect(screen.getByTestId("post-engagement")).toBeInTheDocument();
+    // The post text is still exposed via the same testid (the card carries it).
+    expect(screen.getByTestId("post-text")).toHaveTextContent(
+      "feeling so blessed today honestly"
+    );
   });
 
   it("disables Next until a value is selected, then submits the value", () => {

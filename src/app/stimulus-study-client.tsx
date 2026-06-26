@@ -10,6 +10,7 @@ import ComprehensionCheck from "@/components/ComprehensionCheck";
 import TransitionScreen from "@/components/TransitionScreen";
 import Demographics from "@/components/Demographics";
 import StimulusRating from "@/components/StimulusRating";
+import { renderFormattedText } from "@/lib/format";
 import type { StudyConfig } from "@/lib/study-config";
 
 type Phase =
@@ -21,6 +22,7 @@ type Phase =
   | "rating"
   | "statement-intro"
   | "manipulation-check"
+  | "brand-familiarity"
   | "demographics"
   | "redirect"
   | "failed-check";
@@ -103,11 +105,13 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   const [currentDvIndex, setCurrentDvIndex] = useState(0);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [manipChoice, setManipChoice] = useState<string | null>(null);
+  const [familiarityChoice, setFamiliarityChoice] = useState<string | null>(null);
 
   // Demographics (refs mirror study-client.tsx so the redirect payload is fresh)
   const ageRef = useRef("");
   const genderRef = useRef("");
   const manipRef = useRef<string | null>(null);
+  const familiarityRef = useRef<string | null>(null);
 
   const startTimeRef = useRef<number>(0);
   const studyDataRef = useRef<Record<string, unknown>>({});
@@ -193,6 +197,7 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
       cringePinned: assignment?.cringePinned ?? false,
       ratings,
       manipulationCheck: manipRef.current,
+      brandFamiliarity: familiarityRef.current,
       timing: {
         totalMs: startTimeRef.current > 0 ? endTime - startTimeRef.current : 0,
       },
@@ -247,6 +252,8 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   function advanceAfterRating() {
     if (config.manipulationCheck) {
       setPhase("manipulation-check");
+    } else if (config.brandFamiliarity) {
+      setPhase("brand-familiarity");
     } else if (config.demographics) {
       setPhase("demographics");
     } else {
@@ -272,6 +279,18 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
   function handleManipulationSubmit() {
     if (manipChoice === null) return;
     manipRef.current = manipChoice;
+    if (config.brandFamiliarity) {
+      setPhase("brand-familiarity");
+    } else if (config.demographics) {
+      setPhase("demographics");
+    } else {
+      setPhase("redirect");
+    }
+  }
+
+  function handleFamiliaritySubmit() {
+    if (familiarityChoice === null) return;
+    familiarityRef.current = familiarityChoice;
     if (config.demographics) {
       setPhase("demographics");
     } else {
@@ -344,6 +363,8 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             retryMessage={currentCheck.retryMessage}
             maxAttempts={currentCheck.maxAttempts}
             kickWarning={currentCheck.kickWarning}
+            logoSrc={condition?.logo}
+            logoAlt={condition?.logoAlt}
             onPass={handleComprehensionPass}
             onFail={() => setPhase("failed-check")}
           />
@@ -384,6 +405,8 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             maxLabel={currentDv.maxLabel}
             labelPlacement={config.design.labelPlacement}
             scenarioColor={config.design.scenarioColor}
+            logoSrc={currentDv.hideStimulus ? undefined : condition?.logo}
+            logoAlt={condition?.logoAlt}
             currentIndex={currentDvIndex}
             totalCount={dvOrder.length}
             onSubmit={(rating) => handleRatingSubmit(currentDvId, rating)}
@@ -426,6 +449,39 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
             <button
               onClick={handleManipulationSubmit}
               disabled={manipChoice === null}
+              className="rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {phase === "brand-familiarity" && config.brandFamiliarity && (
+          <div className="flex flex-col items-center gap-8 max-w-2xl">
+            <h3 className="text-lg font-medium text-center">
+              {renderFormattedText(resolveActor(config.brandFamiliarity.question))}
+            </h3>
+            <div className="flex flex-col gap-3 w-full max-w-md text-left">
+              {config.brandFamiliarity.options.map((option) => (
+                <label
+                  key={option}
+                  className="flex items-center gap-3 cursor-pointer rounded-lg border-2 border-zinc-200 px-4 py-3 hover:border-zinc-400"
+                >
+                  <input
+                    type="radio"
+                    name="brand-familiarity"
+                    value={option}
+                    checked={familiarityChoice === option}
+                    onChange={() => setFamiliarityChoice(option)}
+                    className="h-4 w-4 accent-zinc-800"
+                  />
+                  <span className="text-zinc-700">{option}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              onClick={handleFamiliaritySubmit}
+              disabled={familiarityChoice === null}
               className="rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Continue
