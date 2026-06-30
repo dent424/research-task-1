@@ -748,7 +748,7 @@ describe("StimulusStudyClient — brand logo + familiarity (Study 6 shape)", () 
     comprehensionChecks: [
       {
         id: "task",
-        definition: "In this task you'll see a post and answer questions.",
+        definition: "In this task you'll see a post from **{actor}** and answer questions.",
         question: "What is this task about?",
         options: [
           { text: "Reading a post and reacting to it", correct: true },
@@ -834,7 +834,7 @@ describe("StimulusStudyClient — brand logo + familiarity (Study 6 shape)", () 
     });
   }
 
-  it("shows the brand logo on the task page and post card, then asks familiarity after the attention check", async () => {
+  it("names the brand in text (no logo) on the task page, shows the logo on the post card, then asks familiarity after the attention check", async () => {
     mockCondition = "0"; // Coleman
     await act(async () => {
       render(<StimulusStudyClient config={brandConfig} />);
@@ -842,14 +842,16 @@ describe("StimulusStudyClient — brand logo + familiarity (Study 6 shape)", () 
 
     await passConsent();
 
-    // Task/comprehension page shows the assigned brand's logo at the top.
+    // Task/comprehension page identifies the brand in TEXT (no logo here):
+    // {actor} resolves to "Coleman", rendered BOLD, with no brand logo.
     await waitFor(() =>
       expect(screen.getByText("What is this task about?")).toBeInTheDocument()
     );
-    expect(screen.getByTestId("brand-logo")).toHaveAttribute(
-      "src",
-      "/images/study6/coleman.svg"
-    );
+    const brandMention = screen.getByText("Coleman");
+    expect(brandMention.tagName).toBe("STRONG");
+    expect(document.body.textContent).not.toContain("**"); // markdown rendered, not literal
+    expect(screen.queryByText(/\{actor\}/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("brand-logo")).not.toBeInTheDocument();
     await passComprehensionCheck();
 
     // Rating page renders the post as a social-media card with the logo header.

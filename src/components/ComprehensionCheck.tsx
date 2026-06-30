@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { shuffleWithIndex } from "@/lib/shuffle";
+import { renderFormattedText } from "@/lib/format";
 import BrandLogo from "./BrandLogo";
 
 interface ComprehensionOption {
@@ -65,7 +66,7 @@ export default function ComprehensionCheck({
       )}
 
       <div className="whitespace-pre-line text-zinc-700 leading-relaxed">
-        {definition.trim()}
+        {renderFormattedText(definition.trim())}
       </div>
 
       <h3 className="text-lg font-medium">{question}</h3>

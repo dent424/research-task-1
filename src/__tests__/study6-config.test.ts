@@ -134,6 +134,9 @@ describe("study6.yaml config contract", () => {
     expect(config.comprehensionChecks).toHaveLength(1);
     const check = config.comprehensionChecks[0];
     expect(check.definition.length).toBeGreaterThan(0);
+    // The brand is identified by TEXT on this page (no logo), so the task
+    // description must name the assigned brand via the {actor} token.
+    expect(check.definition).toMatch(/\{actor\}/);
     expect(check.question.length).toBeGreaterThan(0);
     expect(check.maxAttempts).toBe(2); // allow one failure, boot on the second
     expect((check.kickWarning ?? "").length).toBeGreaterThan(0);

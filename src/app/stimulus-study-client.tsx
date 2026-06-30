@@ -357,14 +357,12 @@ export default function StimulusStudyClient({ config }: StimulusStudyClientProps
         {phase === "comprehension" && currentCheck && (
           <ComprehensionCheck
             key={currentCheck.id}
-            definition={currentCheck.definition}
-            question={currentCheck.question}
+            definition={resolveActor(currentCheck.definition)}
+            question={resolveActor(currentCheck.question)}
             options={currentCheck.options}
             retryMessage={currentCheck.retryMessage}
             maxAttempts={currentCheck.maxAttempts}
             kickWarning={currentCheck.kickWarning}
-            logoSrc={condition?.logo}
-            logoAlt={condition?.logoAlt}
             onPass={handleComprehensionPass}
             onFail={() => setPhase("failed-check")}
           />

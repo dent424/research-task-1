@@ -183,4 +183,17 @@ describe("ComprehensionCheck", () => {
     render(<ComprehensionCheck {...defaultProps} />);
     expect(screen.queryByTestId("brand-logo")).not.toBeInTheDocument();
   });
+
+  it("renders **bold** markdown in the definition as <strong> (asterisks consumed)", () => {
+    render(
+      <ComprehensionCheck
+        {...defaultProps}
+        definition="In this task you'll see a post from **Coleman** and react to it."
+      />
+    );
+    const bold = screen.getByText("Coleman");
+    expect(bold.tagName).toBe("STRONG");
+    // The literal asterisks must not appear anywhere in the rendered output.
+    expect(document.body.textContent).not.toContain("**");
+  });
 });

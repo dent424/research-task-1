@@ -8,7 +8,7 @@
 #
 # Fully between-subjects: brand = `cond` URL param (0 = Coleman, 1 = Patagonia);
 # invalid/absent -> random. Single fixed post, so the `post` param is unused.
-# {actor} in the intro/scenario resolves to the assigned brand name.
+# {actor} in the task description, scenario, and familiarity question resolves to the assigned brand name.
 
 study:
   id: study6
@@ -18,13 +18,14 @@ study:
 # followed by a one-question comprehension check (the component renders the
 # `definition` and the `question` together). One wrong answer shows the
 # kickWarning; a second wrong answer boots the participant (onFail ->
-# failed-check). {actor} is NOT substituted in comprehension text, so the task
-# description stays brand-generic, but the assigned brand's logo is shown at the
-# top of this page (and the brand name appears with the post on the rating pages).
+# failed-check). {actor} IS substituted in the comprehension text, so the task
+# description NAMES the assigned brand (e.g. "a post from Coleman"). No logo is
+# shown on this page — the brand is identified by text here; the logo appears
+# with the post on the rating pages.
 comprehensionChecks:
   - id: task
     definition: |
-      In this task, you'll see a single social media post from a company and
+      In this task, you'll see a single social media post from **{actor}** and
       answer a couple of short questions about how the post comes across to
       you. There are no right or wrong answers — we're just interested in your
       honest reactions.
@@ -51,8 +52,9 @@ stimuli:
     text: "Happy Earth Day 🌎 There's no Planet B. Let's all do our part. 💚"
 
 # cond = index into this list (0 = Coleman, 1 = Patagonia); invalid/absent -> random.
-# `logo` is a black-and-white wordmark shown on the task page (top) and as the
-# post card's header. The two logos are matched in color (mono) and display size.
+# `logo` is a black-and-white wordmark shown as the post card's header on the
+# rating pages (NOT on the task page — there the brand is named in text). The two
+# logos are matched in color (mono) and display size.
 conditions:
   - key: coleman
     actorNoun: Coleman
